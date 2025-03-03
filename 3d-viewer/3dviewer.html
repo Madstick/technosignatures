@@ -575,10 +575,8 @@ const renderer = new THREE.WebGLRenderer({ antialias: true,preserveDrawingBuffer
 renderer.physicallyCorrectLights = true; 
 renderer.outputEncoding = THREE.sRGBEncoding;
 
-
-const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-const dpr = isMobile ? 0.6 : window.devicePixelRatio || 1;
-renderer.setPixelRatio(dpr);
+const dpr = window.devicePixelRatio || 1;
+renderer.setSize(900 * dpr, 900 * dpr, false);
 renderer.domElement.style.width = '100%';
 renderer.domElement.style.height = '100%';
 renderer.shadowMap.enabled = true;
@@ -2208,16 +2206,12 @@ const loadingScreen = document.getElementById('loading');
       if (loadingScreen) {
         loadingScreen.remove();
       }
+      if (isMobile) {
+    composer.passes = composer.passes.filter(pass => !(pass instanceof FilmPass || pass instanceof OutlinePass));
+}
 
-      let lastFrameTime = 0;
-const targetFPS = isMobile ? 30 : 60;  // Reduce FPS on mobile
-
-function animate(timestamp) {
-    if (timestamp - lastFrameTime < (1000 / targetFPS)) {
-        requestAnimationFrame(animate);
-        return;
-    }
-    lastFrameTime = timestamp;
+function animate() {
+    requestAnimationFrame(animate);
 
     targetX += (mouseX - targetX) * 0.02;
     targetY += (mouseY - targetY) * 0.02;
@@ -2239,7 +2233,6 @@ if (circle) circle.lookAt(camera.position);
 
     composer.render();
     frame_index+=1;
-    requestAnimationFrame(animate);
 }
 
 animate();
