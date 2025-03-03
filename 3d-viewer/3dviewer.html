@@ -368,6 +368,30 @@ saveBtn.addEventListener('click', (e) => {
   saveCanvasImage();
 });
 
+function handleOrientation(event) {
+    let xRotation = event.beta;  // Up/Down tilt (-180 to 180)
+    let yRotation = event.gamma; // Left/Right tilt (-90 to 90)
+
+    console.log("Up/Down (Beta):", xRotation, "Left/Right (Gamma):", yRotation);
+  
+    let object = document.getElementById("someElement"); // Change to your actual element
+    object.style.transform = `rotateX(${xRotation}deg) rotateY(${yRotation}deg)`;
+}
+
+// Check if permission is required (iOS)
+if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    document.body.addEventListener('click', function() {
+        DeviceOrientationEvent.requestPermission()
+            .then(permissionState => {
+                if (permissionState === 'granted') {
+                    window.addEventListener("deviceorientation", handleOrientation, true);
+                }
+            })
+            .catch(console.error);
+    });
+} else {
+    window.addEventListener("deviceorientation", handleOrientation, true);
+}
 
 
     </script>
