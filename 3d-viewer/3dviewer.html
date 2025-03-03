@@ -1,0 +1,2216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Techno Viewer alpha">
+    <meta name="title" content="Techno Viewer alpha">
+    <meta name="twitter:title" content="Techno Viewer alpha">
+    <title>Technosignatures</title>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Ensures full centering */
+  overflow: hidden; /* Prevents any scrolling */
+}
+
+.canvas-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* Prevents content overflow */
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+#loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2em;color:#a9f4c5;letter-spacing:1px;z-index:1000}
+  audio{
+    display: none;
+  }
+  .arrow-buttons {
+  position: absolute;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.7;
+  z-index: 99999;
+  pointer-events: auto;
+  -webkit-touch-callout: none;  /* iOS Safari */
+  -webkit-user-select: none;    /* Safari */
+  -moz-user-select: none;       /* Firefox */
+  -ms-user-select: none;        /* Internet Explorer/Edge */
+  user-select: none;            /* Standard */
+}
+
+.arrow-row {
+  display: flex;
+  gap: 15px;
+}
+
+.arrow-buttons button {
+  width: 1.5em;
+  height: 1.5em;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  transition: opacity 0.3s ease, transform 0.1s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.arrow-buttons button:active {
+  transform: scale(0.9);
+}
+
+@media (max-width: 768px) {
+  .arrow-buttons button {
+    width: 1.5em;
+    height: 1.5em;
+    font-size: 26px;
+  }
+  .arrow-row {
+  gap: 35px;
+}
+}
+
+/* Desktop toolbar (initial state: top left with 10% margin) */
+#toolbar {
+  position: fixed;
+  top: 5%;
+  left: 5%;
+  transform: none;
+  z-index: 9999;
+  background-color: #222;
+  padding: 10px;
+  font-family: 'Courier New', Courier, monospace;
+  color: #fff;
+  width: 90%;
+  max-width: 300px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+/* Container for toolbar content */
+#toolbar .toolbar-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Ensure labels and paragraphs take full width */
+#toolbar .toolbar-content label,
+#toolbar .toolbar-content p {
+  width: 100%;
+}
+
+/* Input and slider take up to 90% width */
+#toolbar .toolbar-content input[type="text"],
+#toolbar .toolbar-content input[type="range"] {
+  width: 90%;
+  box-sizing: border-box;
+  margin: 5px 0;
+}
+
+/* Grouped button containers (centered) */
+#toolbar .travel-container,
+#toolbar .sound-controls,
+#toolbar .toggle-buttons {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 5px 0;
+}
+
+/* Spacing between individual buttons */
+#toolbar .sound-controls button,
+#toolbar .toggle-buttons button,
+#toolbar .travel-container button {
+  margin: 0 5px;
+}
+
+/* Minimized state styling (desktop): Hide content and limit height */
+#toolbar.minimized {
+  width: auto;
+  padding: 5px 10px;
+  cursor: pointer;
+  overflow: hidden;
+  top: 5%;
+  left: 5%;
+  transform: none;
+  text-align: center;
+  max-height: 2.5em; /* Limit height so only the text label shows */
+}
+
+/* Hide all toolbar content when minimized */
+#toolbar.minimized .toolbar-content {
+  display: none !important;
+}
+
+/* Display a "Toolbar" label via pseudo-element when minimized */
+#toolbar.minimized::after {
+  content: "Toolbar";
+  color: #fff;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  display: block;
+  text-align: center;
+}
+
+/* Mobile styling: Under 768px, center toolbar at the very top */
+@media (max-width: 768px) {
+  #toolbar {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  /* Minimized state on mobile: remain centered and limit height */
+  #toolbar.minimized {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    max-height: 2.5em;
+    padding: 5px 10px;
+  }
+}
+
+@media (max-width: 440px) {
+  #toolbar:not(.minimized) {
+    transform-origin: top center;
+    transform: translateX(-50%) scale(0.75);
+  }
+}
+
+/* Save Button styling */
+#saveBtn {
+  position: absolute;
+  bottom: 5%;
+  left: 5%;
+  padding: 0.5em 1em;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  background: #444;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 9999;
+}
+
+/* On desktop, hide the save button when the toolbar is minimized */
+@media (min-width: 768px) {
+  /* We will use a class that we add via JS when toolbar is minimized */
+  #saveBtn.hidden-when-toolbar-minimized {
+    display: none;
+  }
+}
+
+/* On mobile, always show the save button (even if toolbar is minimized) */
+@media (max-width: 768px) {
+  #saveBtn {
+    display: block;
+  }
+}
+
+
+</style>
+  </head>
+  <body>
+
+        
+    <div class="canvas-wrapper">
+      <div id="loading">LOADING...</div>
+      <audio id="audioPlayer" src="sound.mp3" muted></audio>
+<div id="toolbar">
+  <div class="toolbar-content">
+    <label for="inscriptionInput">Your inscription ID: ..i0</label>
+    <input id="inscriptionInput" type="text" placeholder="ex: 00b5999df771a332f8f701003bc35adf3f4c7d9312e0f032aa651a5c18e9ede0i0" />
+    
+    <div class="travel-container">
+      <button id="travelButton">Travel</button>
+    </div>
+    
+    <div class="sound-controls">
+      <button id="soundToggle">
+        <span id="soundIcon" style="font-size: 18px;">🔇</span>
+        <span id="soundLabel">Sound Off</span>
+      </button>
+      <button id="nextButton">Next</button>
+    </div>
+    
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.3" />
+    
+    <div class="toggle-buttons">
+      <button id="haloToggle">Halo On</button>
+      <button id="viewToggle">Classic View</button>
+    </div>
+    
+    <p>
+      Controls: W A S D to move.<br>
+      Press T key or touch the toolbar to minimize it.<br>
+      Press R key or click save to save an image.
+    </p>
+  </div>
+</div>
+
+      <div id="arrowControls" class="arrow-buttons">
+        <button id="moveUp">▲</button>
+        <div class="arrow-row">
+          <button id="moveLeft">◄</button>
+          <button id="moveRight">►</button>
+        </div>
+        <button id="moveDown">▼</button>
+      </div>
+      <button id="saveBtn">Save</button>
+    </div>
+    <script src='https://ordinals.com/content/0b30798a5da8a4df51d75b2918159fb52f86327fac2138ba1022213fedf71564i0'></script>
+    <script src='https://ordinals.com/content/fb8993e3b69a1b9239fc2e2e3694ad07f5064af55e73641e4c260b5797dedf08i0'></script>
+
+    <script>
+      // --- Inscription ID Logic ---
+      const baseInscriptionId = "00b5999df771a332f8f701003bc35adf3f4c7d9312e0f032aa651a5c18e9ede0i0";
+      // Read inscription_id from the URL parameter 'id' or fallback to the base.
+      const urlParams = new URLSearchParams(window.location.search);
+      let inscription_id = urlParams.get("id") || baseInscriptionId;
+      
+      const inscriptionInput = document.getElementById('inscriptionInput');
+      // Set the input's value to the current inscription id.
+      inscriptionInput.value = inscription_id;
+      
+      // --- Travel Button: Reload with New ID ---
+      const travelButton = document.getElementById('travelButton');
+      travelButton.addEventListener('click', () => {
+        const newId = inscriptionInput.value.trim();
+        if (newId.length > 0 && newId !== inscription_id) {
+          // Reload the page with the new inscription id.
+          window.location.href = '?id=' + newId;
+        } else {
+          // If field is empty or unchanged, revert the input to the current id.
+          inscriptionInput.value = inscription_id;
+        }
+      });
+      
+      // --- Audio & Toolbar Logic ---
+      const audioPlayer = document.getElementById('audioPlayer');
+      const soundToggle = document.getElementById('soundToggle');
+      const soundIcon = document.getElementById('soundIcon');
+      const nextButton = document.getElementById('nextButton');
+      const volumeSlider = document.getElementById('volumeSlider');
+      volumeSlider.addEventListener('input', function() {
+  audioPlayer.volume = this.value;
+});
+      // Playlist array with three MP3 files (adjust filenames as needed)
+      const playlist = ['sound.mp3', 'sound2.mp3', 'sound3.mp3'];
+      let currentTrack = 0;
+      
+      // Flag to track if user manually muted the sound.
+      let isSoundOffByUser = true;
+      
+      // Set default volume and mute state.
+      audioPlayer.volume = 0.3;
+      audioPlayer.muted = true;
+      
+      soundToggle.addEventListener('click', () => {
+  if (audioPlayer.muted) {
+    audioPlayer.muted = false;
+    isSoundOffByUser = false;
+    soundIcon.textContent = "🔊";  // Update only the icon text
+    soundLabel.textContent = "Sound On"; // Update only the label
+    audioPlayer.play();
+  } else {
+    audioPlayer.muted = true;
+    isSoundOffByUser = true;
+    soundIcon.textContent = "🔇";
+    soundLabel.textContent = "Sound Off";
+  }
+});
+      
+      nextButton.addEventListener('click', () => {
+        currentTrack = (currentTrack + 1) % playlist.length;
+        audioPlayer.src = playlist[currentTrack];
+        if (!isSoundOffByUser) {
+          audioPlayer.play();
+        }
+      });
+   
+      function saveCanvasImage() {
+  const canvas = document.querySelector('canvas'); // Assumes one canvas element
+  const dataURL = canvas.toDataURL('image/png');
+  const link = document.createElement('a');
+  link.href = dataURL;
+  link.download = 'canvas.png';
+  link.click();
+}
+const saveBtn = document.getElementById('saveBtn');
+saveBtn.addEventListener('click', (e) => {
+  // Prevent the toolbar from toggling when clicking the button:
+  e.stopPropagation();
+  saveCanvasImage();
+});
+
+
+
+    </script>
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.module.min.js",
+      "three/examples/jsm/": "https://cdn.jsdelivr.net/npm/three@0.155.0/examples/jsm/"
+    }
+  }
+  </script>
+
+    <script type="module">
+  import { ZedSatologistV0 } from 'https://ordinals.com/content/fb8993e3b69a1b9239fc2e2e3694ad07f5064af55e73641e4c260b5797dedf08i0';
+  import * as THREE from 'three';
+    import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+    import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+    import { AfterimagePass } from 'three/examples/jsm/postprocessing/AfterimagePass.js';
+    import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass.js';
+    import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
+
+  const response = await window.fetch('https://ordinals.com/content/2dbdf9ebbec6be793fd16ae9b797c7cf968ab2427166aaf390b90b71778266abi0');
+  let baseUrl = 'https://ordinals.com';
+  let composer;
+
+  // Base inscription ID
+
+
+    
+const inscriptionInput = document.getElementById('inscriptionInput');
+// Set the input's value to the current inscription id.
+inscriptionInput.value = inscription_id;
+
+inscriptionInput.addEventListener('change', (e) => {
+  const newId = e.target.value.trim();
+  if (newId.length > 0 && newId !== inscription_id) {
+    // Reload the page with the new inscription id as a query parameter.
+    window.location.href = '?id=' + newId;
+  } else if (newId.length === 0) {
+    // If the field is cleared, revert to the current id.
+    e.target.value = inscription_id;
+  }
+});
+    if (!inscription_id) {
+      inscription_id = window.location.pathname.split("/").pop();
+    }
+
+
+//  711a1fc90b074adf2cc89b270f0f634b40458c3fb4a6a531d1119ceabdbe6e8di0  00b5999df771a332f8f701003bc35adf3f4c7d9312e0f032aa651a5c18e9ede0i0
+  //inscription_id = "ec8b02656d1f5806a9d13fda98681f07259a3e4d753e1ec7b389abe46c505693i0";
+  const text = await response.text();
+  const b64str = text.split('\n')[32].split('\'')[1];
+ 
+ 
+Math.random = function() {
+  return THREE.MathUtils.seededRandom();
+};
+const simplex = new SimplexNoise(Math.random);
+ 
+function hashToInt(e) {
+  let i = 0;
+  if (0 === e.length) return i;
+  for (let n = 0; n < e.length; n++) {
+      i = (i << 5) - i + e.charCodeAt(n), i |= 0
+  }
+  return Math.abs(i)
+}
+ 
+let numberFromHash = hashToInt(inscription_id);
+
+ 
+THREE.MathUtils.seededRandom(numberFromHash);
+THREE.ColorManagement.legacyMode = false;
+ 
+let mouseX = 0;
+let mouseY = 0;
+let targetX = 0;
+let targetY = 0;
+let gyroX = 0, gyroY = 0;
+let useGyro = false;
+
+document.addEventListener("mousemove", (event) => {
+    const halfWidth = window.innerWidth / 2;
+    const halfHeight = window.innerHeight / 2;
+
+    mouseX = (event.clientX - halfWidth) / halfWidth;
+    mouseY = (event.clientY - halfHeight) / halfHeight;
+});
+
+window.addEventListener("deviceorientation", (event) => {
+    useGyro = true;
+
+    gyroX = event.gamma / 30;
+    gyroY = event.beta / 30;
+});
+
+
+ 
+  const getInscriptionSat = async e => {
+      try {
+        let t = await fetch(baseUrl + "/r/inscription/" + e);
+        return (await t.json()).sat;
+      } catch (e) {
+      }
+    };
+    const satologist = new ZedSatologistV0({
+      async text(path) {
+        const response = await fetch(baseUrl + path);
+        return response.text();
+      },
+    });
+    let satributes = [];
+    const sat = await getInscriptionSat(inscription_id)
+    await satologist.init();
+    satributes.push(...satologist.satributes(sat))
+    const useDoubleSphere = satributes.includes("palindrome")
+    const vintage = satributes.includes("vintage")
+    let backgroundColor; 
+    let r1 = Math.random();
+    let r2 = Math.random();
+
+function map(value, min1, max1, min2, max2) {
+  return min2 + ((value - min1) * (max2 - min2)) / (max1 - min1);
+}
+const dist = (x1, y1, z1, x2, y2, z2) =>
+  Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2);
+ 
+function noise_3D(x, y, z) {
+  return [
+    map(simplex.noise2D(x / noise_ratio, y / noise_ratio), -1, 1, 0, 1),
+    map(simplex.noise2D(y / noise_ratio, z / noise_ratio), -1, 1, 0, 1),
+    map(simplex.noise2D(z / noise_ratio, x / noise_ratio), -1, 1, 0, 1),
+  ];
+}
+function computeCurl(x, y, z) {
+  var eps = 1e-4;
+  var curl = [];
+ 
+  var n1 = noise_3D(x + eps, y, z);
+  var n2 = noise_3D(x - eps, y, z);
+  var dx = [n1[0] - n2[0], n1[1] - n2[1], n1[2] - n2[2]];
+ 
+  n1 = noise_3D(x, y + eps, z);
+  n2 = noise_3D(x, y - eps, z);
+  var dy = [n1[0] - n2[0], n1[1] - n2[1], n1[2] - n2[2]];
+ 
+  n1 = noise_3D(x, y, z + eps);
+  n2 = noise_3D(x, y, z - eps);
+  var dz = [n1[0] - n2[0], n1[1] - n2[1], n1[2] - n2[2]];
+ 
+  curl[0] = (dy[2] - dz[1]) / (2.0 * eps);
+  curl[1] = (dz[0] - dx[2]) / (2.0 * eps);
+  curl[2] = (dx[1] - dy[0]) / (2.0 * eps);
+ 
+  return curl;
+}
+function getRandomElement(arr) {
+  if (arr.length === 0) {
+    return null;
+  }
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  return arr[randomIndex];
+}
+ 
+let noise_ratio = 222;
+let size_ratio = 2222;
+let curl_length = 1;
+
+let curl_ratio = Math.min(getRandomElement([2,2,2,1,2]), 1.8);
+let animation_style = getRandomElement([1,10,10,1,1,1]);
+let ratio = 1;
+const scene = new THREE.Scene();
+let camera = new THREE.PerspectiveCamera(75, ratio, 0.1, 1000);
+let camera_x_offset = map(Math.random(), 0, 1, -2, 2);
+camera.position.set(camera_x_offset, 6, 22.5);
+camera.lookAt(0, 6, 0);
+camera.aspect = 1;
+const renderer = new THREE.WebGLRenderer({ antialias: true,preserveDrawingBuffer: true,  });
+renderer.physicallyCorrectLights = true; 
+renderer.outputEncoding = THREE.sRGBEncoding;
+
+const dpr = window.devicePixelRatio || 1;
+renderer.setSize(900 * dpr, 900 * dpr, false);
+renderer.domElement.style.width = '100%';
+renderer.domElement.style.height = '100%';
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+scene.background = new THREE.Color(0x808080);
+document.querySelector('.canvas-wrapper').appendChild(renderer.domElement);
+
+window.addEventListener('resize', onWindowResize, false);
+
+function onWindowResize() {
+  const canvasWrapper = document.querySelector('.canvas-wrapper');
+  const newSize = canvasWrapper.clientWidth; 
+  camera.aspect = newSize / newSize;
+  camera.updateProjectionMatrix();
+  const dpr = window.devicePixelRatio || 1;
+  renderer.setSize(newSize * dpr, newSize * dpr, false);
+}
+
+let width= Math.floor(Math.random()*300)+100;
+let height= Math.floor(Math.random()*50)+100;
+let widthSegments= Math.floor(Math.random()*150)+150;
+let heightSegments= Math.floor(Math.random()*300)+350
+let displrand= Math.floor(Math.random()*118)+12
+let displrand2= Math.floor(Math.random()*118)+2
+
+ 
+const geometry = new THREE.PlaneGeometry(
+  width,
+  height,
+  widthSegments,
+  heightSegments
+);
+const centerModeObjects = [];
+let noise_positions = [];
+let center_mode = getRandomElement([1,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
+let x_center = 2;
+let color_mode;
+if(vintage){
+    color_mode = getRandomElement([1,7]);
+    console.log("vintage")
+} else {
+    color_mode = getRandomElement([1,2,2,3,4,5,6,7,8,9,10,10,11]);
+}
+// color_mode = 1;
+// Seed Math.random using your inscription hash (make sure this happens before any random numbers are generated):
+
+
+let rterrain = Math.random() * 1;
+if (
+  satributes.includes("blackuncommon") ||
+  satributes.includes("blackrare") ||
+  satributes.includes("blackepic") ||
+  satributes.includes("blacklegendary") ||
+  satributes.includes("blackmythic")
+) {
+  console.log("Black sat detected—using black clear color and background");
+  renderer.setClearColor(new THREE.Color(0x0d0d0d));
+  backgroundColor = new THREE.Color(0x0d0d0d);
+  r2=0.01;
+} else {
+  if (Math.random() < 0.5) {
+    renderer.setClearColor(new THREE.Color(0x0d0d0d));
+  } else {
+    renderer.setClearColor(new THREE.Color(0xfff1e6));
+  }
+  
+  if (Math.random() < 0.25) {
+    backgroundColor = new THREE.Color(0x0d0d0d);
+  } else if (Math.random() < 0.65) {
+    backgroundColor = new THREE.Color(0x808080);
+  } else {
+    backgroundColor = new THREE.Color(0xf4f4f4);
+  }
+}
+const applyNoise = () => {
+  const positions = geometry.attributes.position.array;
+  const cubeSpacing = 0.5; 
+ 
+  noise_positions = [];
+ 
+  for (let i = 0; i < positions.length; i += 3) {
+    const x = positions[i];
+    const y = positions[i + 1];
+    const z = positions[i + 2];
+ 
+    const displacement = (simplex.noise2D(x / displrand, y / displrand2) * y) / 5;
+ 
+    if (rterrain<=0.5) {
+      positions[i] = Math.round(x / cubeSpacing) * cubeSpacing; 
+      positions[i + 1] = Math.round(y / cubeSpacing) * cubeSpacing; 
+    let heightScale = map(z,-100,camera.position.z-2,4,1);
+ 
+    positions[i + 2] = Math.round(z / cubeSpacing) * cubeSpacing + displacement * heightScale;
+    }  else {
+      if (Math.random() < 0.5) {
+        positions[i] = Math.round(x / cubeSpacing) * cubeSpacing; 
+        positions[i + 1] = Math.round(y / cubeSpacing) * cubeSpacing; 
+      let heightScale = map(z,-100,camera.position.z-2,4,1);
+ 
+      positions[i + 2] = Math.round(z / cubeSpacing) * cubeSpacing + displacement * heightScale;
+      } else {
+        positions[i + 2] += displacement;
+      }
+    }
+    noise_positions.push([positions[i], positions[i + 1], positions[i + 2]]);
+  }
+ 
+  noise_positions.sort((a, b) => a[2] - b[2]);
+  noise_positions = noise_positions.slice(Math.round(noise_positions.length * 0.65));
+ 
+  for (let i = 0; i < positions.length; i += 3) {
+    const x = positions[i];
+    const y = positions[i + 1];
+    const z = positions[i + 2];
+    const displacement2 = (simplex.noise2D(((x + 1) / (y + 2)) * 122222, ((y + 1) / (x + 2)) * 122222) * Math.random() * x) / 4;
+ 
+    if (simplex.noise2D(x * 1111, y * 1111) < -0.65) {
+      positions[i + 2] += displacement2;
+    }
+  }
+ 
+    for (let i = 0; i < 44; i++) {
+    let new_point = noise_positions[Math.floor(Math.random() * noise_positions.length)];
+ 
+    if (!new_point || new_point.length === 0) {
+      continue;
+    }
+ 
+    for (let i = 0; i < positions.length; i += 3) {
+      const x = positions[i];
+      const y = positions[i + 1];
+      const z = positions[i + 2];
+      const displacement = (simplex.noise2D(x / 12, y / 12) * Math.abs(x * 4)) / 10;
+      let d = dist(x, y, z, 0, x_center, 0);
+ 
+      if (Math.abs(x - new_point[0]) < 4 && Math.abs(y - new_point[1]) < 4) {
+        positions[i + 2] += displacement;
+      }
+    }
+    geometry.attributes.position.needsUpdate = true;
+  }
+};
+ 
+applyNoise();
+ 
+const material = new THREE.MeshStandardMaterial({
+  color: 0x777777,
+  side: THREE.DoubleSide,
+  flatShading: true,
+});
+const plane_material = new THREE.MeshStandardMaterial({
+  color: 0x222222,
+  side: THREE.DoubleSide,
+  flatShading: true,
+});
+material.needsUpdate = true;
+plane_material.needsUpdate = true;
+const plane = new THREE.Mesh(geometry, plane_material);
+plane.rotation.x = -Math.PI / 2;
+plane.receiveShadow = true;
+plane.castShadow = false;
+scene.add(plane);
+let plr= (Math.random()*20)-10
+let plr2= (Math.random()*10)-5
+let sc;
+let circle1 = null;
+let circle2 = null;
+let circle = null;
+let activeSphere;
+let circle_size_offset = 1;
+if ([1,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].includes(center_mode)) {
+  if (r2<0.05){
+    sc=0x4a4a4a
+  } else if (r2<0.30){
+    sc=0x464646
+  }else {
+    sc=0xd9d9a5
+  }
+  const material_white = new THREE.MeshStandardMaterial({
+    color: sc,
+    emissive: sc,
+    emissiveIntensity: 1,
+  });
+  let circle_x_offset = map(Math.random(), 0, 1, -0.5, 0.5);
+  let rssi=(Math.random()*100)+30
+  let ofs=(Math.random()*60)+20
+  if (useDoubleSphere || r1 < 0.15) {
+    let dblsof=(Math.random()*2)+0.2
+    let vr=(Math.random()*10)-5
+    let vr2=(Math.random()*10)-5
+    const smallerSizeOffset = map(Math.random(), 0, 1, 0.4, 0.9)*dblsof; 
+    const smallerCircleGeometry1 = new THREE.CircleGeometry(66 * smallerSizeOffset, 84);
+    const smallerCircleGeometry2 = new THREE.CircleGeometry(66 * smallerSizeOffset, 84);
+ 
+    circle1 = new THREE.Mesh(smallerCircleGeometry1, material_white);
+    circle2 = new THREE.Mesh(smallerCircleGeometry2, material_white);
+ 
+    const offsetDistance = ofs*smallerSizeOffset;
+    circle1.position.set((circle_x_offset - 0.9) * 66 * smallerSizeOffset - offsetDistance, rssi+30+vr, -250);
+    circle2.position.set((circle_x_offset + 0.9) * 66 * smallerSizeOffset + offsetDistance, rssi+30+vr2, -250);
+ 
+    scene.add(circle1);
+    scene.add(circle2);
+    circle1.receiveShadow = true;
+    circle2.receiveShadow = true;
+  } else {
+      circle_size_offset = Math.random() < 0.4 
+      ? map(Math.random(), 0, 1, 0.65, 1.8)
+      : map(Math.random(), 0, 1, 0.45, 1.8) * 4;
+
+    let circle_geometry = new THREE.CircleGeometry(66 * circle_size_offset, 84);
+    circle = new THREE.Mesh(circle_geometry, material_white);
+    circle.position.set(map(Math.random(), 0, 1, -1.5, 1.5) * 66 * circle_size_offset, 
+                        Math.random() * 100 + 130, 
+                        -500);
+
+    circle.receiveShadow = true;
+    scene.add(circle);
+    activeSphere = circle;
+
+  }
+}
+
+let material_color = 0x333333;
+
+function generateCenterModeTexture() {
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const imageData = ctx.createImageData(size, size);
+
+  // Use different scales and weights than the ground texture.
+  const lowFreqScale = 40;    // slightly larger features
+  const highFreqScale = 12;   // finer detail
+  const lowFreqWeight = 0.6;
+  const highFreqWeight = 0.4;
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      // Use your seeded simplex noise (which is already set up)
+      let nLow = simplex.noise2D(x / lowFreqScale, y / lowFreqScale);
+      let nHigh = simplex.noise2D(x / highFreqScale, y / highFreqScale);
+      let n = lowFreqWeight * nLow + highFreqWeight * nHigh;
+      // Remap from [-1,1] to [0,1]
+      n = (n + 1) / 2;
+      // Use a less aggressive nonlinear curve than for gravel
+      n = Math.pow(n, 1.2);
+      // Map to a tinted color—for example, a cooler tone:
+      const base = Math.floor(n * 255);
+      const r = Math.floor(base * 0.85);
+      const g = Math.floor(base * 0.9);
+      // Add a slight blue tint
+      const b = Math.min(255, base + 30);
+      const index = (x + y * size) * 4;
+      imageData.data[index] = r;
+      imageData.data[index + 1] = g;
+      imageData.data[index + 2] = b;
+      imageData.data[index + 3] = 255;
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+
+  // Create and return the texture.
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(4, 4); // adjust repetition to taste
+  return texture;
+}
+
+if (center_mode == 2) {
+  let sphere_size = map(Math.random(), 0, 1, 2, 2.5);
+  for (var i = 0; i < 6 + parseInt(Math.random()*5); i++) {
+    const sphereGeometry = new THREE.SphereGeometry(sphere_size, 128, 128);
+    const sphereMesh = new THREE.Mesh(sphereGeometry, material);
+    sphereMesh.position.set(
+      -12+Math.random()*2+sphere_size * 2 + sphere_size * i,
+      x_center + 10 + simplex.noise2D(i/2,0)*2,
+      0
+    );
+ 
+    const positionAttribute = sphereGeometry.getAttribute("position");
+    let k = 0.9;
+    for (let i = 0; i < positionAttribute.count; i++) {
+      const p = new THREE.Vector3().fromBufferAttribute(positionAttribute, i);
+      p.normalize().multiplyScalar(
+        1 + 4.3 * simplex.noise3D(p.x * k, p.y * k * 0.1, p.z * k * 0.1)
+      );
+      positionAttribute.setXYZ(i, p.x, p.y, p.z);
+    }
+    sphereMesh.receiveShadow = true;
+    sphereMesh.castShadow = true;
+    scene.add(sphereMesh);
+    centerModeObjects.push(sphereMesh);
+  } 
+} else if (center_mode == 3) {
+  let torusCount = map(Math.random(), 0, 1, 4, 8) * 2;
+  let torus_index = map(Math.random(), 0, 1, 0, 2) * Math.PI;
+ 
+  for (var i = 0; i < torusCount; i++) {
+    let torus_radius_ratio = i ? i : 1;
+    const torusGeometry = new THREE.TorusGeometry(20 / torus_radius_ratio, 0.2, 16, 100);
+    const torus = new THREE.Mesh(torusGeometry, material);
+    torus.position.set(0, 8 + i, -1.5 * i);
+    torus.rotation.x = Math.PI / 2.95;
+    torus.rotation.y = torus_index + (i * Math.PI) / torusCount;
+    torus.receiveShadow = true;
+    torus.castShadow = true;
+    scene.add(torus);
+    centerModeObjects.push(torus);
+  }
+} else if (center_mode == 4) {
+  let tt = (Math.random()*33)+2;
+  let octahedron_size = map(Math.random(), 0, 1, 1, 2) / 0.75+tt/3;
+  let octahedron_count = map(Math.random(), 0, 1, 4, 10);
+  for (var i = 0; i < octahedron_count; i++) {
+    let new_octahedron_size = map(
+      i,
+      0,
+      octahedron_count,
+      octahedron_size / octahedron_count,
+      octahedron_size
+    );
+    const octahedronGeometry = new THREE.OctahedronGeometry(
+      new_octahedron_size
+    );
+    octahedronGeometry.scale(1, 1.5, 1);
+    const octahedronMesh = new THREE.Mesh(octahedronGeometry, material);
+    octahedronMesh.position.set(
+      map(Math.random(), 0, 1, -2, 2),
+      x_center +
+        octahedron_size * 2 +
+        (i + 1) * (new_octahedron_size * 1.5) -
+        octahedron_size,
+      octahedron_size * 2.5
+    );
+    octahedronMesh.receiveShadow = true;
+    octahedronMesh.castShadow = true;
+    scene.add(octahedronMesh);
+  }
+ 
+  let torusCount = map(Math.random(), 0, 1, 4, 18) * 2;
+  let rotation_index = map(Math.random(), 0, 1, 11, 32);
+  let torus_ratio = 2;
+  if (Math.random() < 0.2) {
+    torus_ratio = 3;
+  }
+  for (var i = 0; i < torusCount; i++) {
+    const torusGeometry = new THREE.TorusGeometry(
+      i * torus_ratio,
+      0.6,
+      16,
+      100
+    );
+    const torus = new THREE.Mesh(torusGeometry, material);
+    torus.position.set(0, 1 + i * 4, -1.5 * 1-tt);
+    torus.rotation.x = Math.PI / 2;
+    torus.rotation.y = Math.PI / (i / rotation_index);
+    torus.receiveShadow = true;
+    torus.castShadow = true;
+    scene.add(torus);
+  }
+ 
+  let sphere_size = map(Math.random(), 0, 1, 1, 4);
+  let spheres_count = map(Math.random(), 0, 1, 4, 10);
+  let sphere_y_offset = Math.random() * 4.5 - 0.5;
+  for (var i = 0; i < spheres_count; i++) {
+    let new_sphere_size = map(
+      i,
+      0,
+      spheres_count,
+      sphere_size / spheres_count,
+      sphere_size
+    );
+    const sphereGeometry = new THREE.SphereGeometry(new_sphere_size, 132, 132);
+    const sphereMesh = new THREE.Mesh(sphereGeometry, material);
+    sphereMesh.position.set(
+      map(Math.random(), 0, 1, -5, 5),
+      sphere_y_offset,
+      x_center +
+        sphere_size * 2 +
+        (i + 1) * (new_sphere_size * 1.5) -
+        sphere_size-tt
+    );
+    sphereMesh.receiveShadow = true;
+    sphereMesh.castShadow = true;
+    scene.add(sphereMesh);
+    centerModeObjects.push(sphereMesh);
+  }
+} else if (center_mode == 5) {
+  let cubes_count = map(Math.random(), 0, 1, 4, 15);
+  let box_size = map(cubes_count, 4, 15, 1.8, 0.6);
+  let distance_ratio = map(Math.random(), 0, 1, 0.9, 1.25);
+  let cubes_ratio = map(Math.random(), 0, 1, 65, 75);
+  const box_group = new THREE.Group();
+  for (var i = 0; i < cubes_count; i++) {
+    for (var j = 0; j < cubes_count; j++) {
+      for (var k = 0; k < cubes_count; k++) {
+        let size_ratio =
+          map(j, 0, cubes_count, 1, 0.8) * map(i, 0, cubes_count, 0.8, 1);
+        let space_ratio = 0.9;
+        const boxGeometry = new THREE.BoxGeometry(
+          box_size * size_ratio,
+          box_size * size_ratio,
+          box_size * size_ratio
+        );
+        const box = new THREE.Mesh(boxGeometry, material);
+        box.position.set(
+          Math.pow(i, distance_ratio) * (box_size * space_ratio) - 2,
+          x_center + Math.pow(j, distance_ratio) * (box_size * space_ratio) + 4,
+          Math.pow(k, distance_ratio) * (box_size * space_ratio)
+        );
+        if (
+          map(
+            simplex.noise3D(
+              box.position.x / 4,
+              box.position.y / 4,
+              box.position.z / 4
+            ),
+            -1,
+            1,
+            0,
+            100
+          ) < cubes_ratio
+        ) {
+          box.receiveShadow = true;
+          box.castShadow = true;
+          box_group.add(box);
+        }
+      }
+    }
+  }
+ 
+ 
+    let rotations_array = [
+    [9.01,8.01,23.02,5,4,4,0],
+    [89,8.01,23.02,-8,12,4,-1],
+    [89,89.01,23.02, -6,12,-2,2],
+    [12,89.01,12.02, -6,8,0,-16],
+];
+ 
+  let rotations = rotations_array[Math.floor(Math.random() * rotations_array.length)];
+  box_group.rotation.y = rotations[0];
+  box_group.rotation.x = rotations[1];
+  box_group.rotation.z = rotations[2];
+  box_group.position.x += rotations[3]+plr;
+  box_group.position.y += rotations[4] -rotations[5] * distance_ratio;
+  box_group.position.z += rotations[6];
+ 
+  scene.add(box_group);
+  centerModeObjects.push(box_group);
+} else if (center_mode == 6) {
+  let torusCount = map(Math.random(), 0, 1, 4, 8) * 4;
+  let torus_index = map(Math.random(), 0, 1, 0, 2) * Math.PI;
+  for (var i = 0; i < torusCount; i++) {
+    const torusGeometry = new THREE.TorusGeometry(i * 2, 0.2, 16, 100);
+    const torus = new THREE.Mesh(torusGeometry, material);
+    torus.position.set(0, 8 + i, -1.5 * i);
+    torus.rotation.x = Math.PI / 1.95;
+    torus.rotation.y = torus_index + (i * Math.PI) / torusCount;
+    torus.receiveShadow = true;
+    torus.castShadow = true;
+    scene.add(torus);
+    centerModeObjects.push(torus);
+  }
+} else if (center_mode == 7) {
+  let torusCount = map(Math.random(), 0, 1, 4, 8) * map(Math.random(),0,1,4,20);
+  let torus_index = map(Math.random(), 0, 1, 0, 2) * Math.PI;
+  let torus_mode = 1;
+  if (Math.random()*100 < 50) {
+    torus_mode = 2;
+  }
+  for (var i = 0; i < torusCount; i++) {
+    let torusGeometry;
+    if (torus_mode==1) {
+      torusGeometry = new THREE.TorusGeometry(
+        map(i, 0, torusCount, 6, i/1)+plr,
+        0.2,
+        16,
+        100
+      );
+    }else{
+      torusGeometry = new THREE.TorusGeometry(
+        map(i, 0, torusCount, 6, Math.sin(i/2) * i)+plr,
+        0.2,
+        16,
+        100
+      );
+    }
+    const torus = new THREE.Mesh(torusGeometry, material);
+    torus.position.set(0, 1 + i * 2, -2.5 * i);
+    torus.rotation.x = Math.PI / 3.2;
+    torus.rotation.y = torus_index + (i * Math.PI) / torusCount;
+    torus.receiveShadow = true;
+    torus.castShadow = true;
+    scene.add(torus);
+    centerModeObjects.push(torus);
+  }
+ 
+  let sphere_size = map(Math.random(), 0, 1, 1, 2);
+  let spheres_count = map(Math.random(), 0, 1, 2, 10);
+  for (var i = 0; i < spheres_count; i++) {
+    let new_sphere_size = map(
+      i,
+      0,
+      spheres_count,
+      sphere_size / spheres_count,
+      sphere_size
+    );
+    const sphereGeometry = new THREE.SphereGeometry(new_sphere_size, 32, 32);
+    const sphereMesh = new THREE.Mesh(sphereGeometry, material);
+    sphereMesh.position.set(
+      map(Math.random(), 0, 1, -5, 5),
+      x_center +
+        sphere_size * 2 +
+        (i + 1) * (new_sphere_size * 1.5) -
+        sphere_size,
+      sphere_size * 2.5
+    );
+    sphereMesh.receiveShadow = true;
+    sphereMesh.castShadow = true;
+    scene.add(sphereMesh);
+    centerModeObjects.push(sphereMesh);
+  }
+} else if (center_mode == 8) {
+  const geometry = new THREE.TorusKnotGeometry(
+    4,
+    0.25,
+    100,
+    16,
+    map(Math.random(), 0, 1, 2, 6),
+    map(Math.random(), 0, 1, 2, 6)
+  );
+  const torusKnot = new THREE.Mesh(geometry, material);
+  torusKnot.position.set(0, x_center + 8, 0);
+  torusKnot.rotation.y = Math.PI / 4;
+  torusKnot.rotation.z = map(
+    Math.random(),
+    0,
+    1,
+    -Math.PI / 3.5,
+    Math.PI / 4.5
+  );
+  torusKnot.receiveShadow = true;
+  torusKnot.castShadow = true;
+  scene.add(torusKnot);
+  centerModeObjects.push(torusKnot);
+} else if (center_mode == 9) {
+  let sphere_size = map(Math.random(), 0, 1, 2, 2.5);
+  const sphereGroup = new THREE.Group();
+  for (var i = 0; i < 5; i++) {
+    const sphereGeometry = new THREE.SphereGeometry(sphere_size, 128, 128);
+    const sphereMesh = new THREE.Mesh(sphereGeometry, material);
+    sphereMesh.castShadow = true;
+    sphereMesh.position.set(
+      0,
+      x_center + sphere_size * 2 + sphere_size * i * 1.2 - sphere_size * 2,
+      sphere_size * 2.5
+    );
+ 
+    const positionAttribute = sphereGeometry.getAttribute("position");
+    let k = 0.9 + 1 * i;
+    for (let i = 0; i < positionAttribute.count; i++) {
+      const p = new THREE.Vector3().fromBufferAttribute(positionAttribute, i);
+      p.normalize().multiplyScalar(
+        (1 +
+          ((2.3 *
+            simplex.noise3D(p.x * k * 0.1, p.y * k * 0.2, p.z * k * 0.4)) /
+            i) *
+            i *
+            10) /
+          5
+      );
+      positionAttribute.setXYZ(i, p.x, p.y, p.z);
+    }
+    sphereGroup.add(sphereMesh);
+  }
+  sphereGroup.rotation.z = Math.PI / -2;
+  sphereGroup.rotation.y = Math.PI / 12;
+  if (Math.random() * 100 < 25) {
+    sphereGroup.rotation.y = -sphereGroup.rotation.y;
+  }
+  sphereGroup.position.z += 4;
+ 
+  sphereGroup.position.x -= 8;
+  sphereGroup.position.y += 10;
+  sphereGroup.position.z -= 2;
+  sphereGroup.castShadow = true;
+  sphereGroup.receiveShadow = false;
+ 
+  scene.add(sphereGroup);
+  centerModeObjects.push(sphereGroup);
+}else if(center_mode==10){
+  let x_size = map(Math.random(),0,1,2,8);
+  let z_size = map(Math.random(),0,1,2,6);
+  let rc= (Math.random()*10)+12
+  for (let i = -x_size; i < x_size; i++) {
+    for (let j = 0; j < rc; j++) {
+      for (let k = 0; k < z_size; k++) {
+        let g2 = new THREE.BoxGeometry(1,1,1);
+        let mesh_g2 = new THREE.Mesh(g2,material);
+        mesh_g2.position.set(i+plr2,j,k+plr2);
+        if (simplex.noise3D(i/2,j,k/2)<0) {
+          if (simplex.noise2D(Math.abs(i)*2,0)<0.5){
+            mesh_g2.receiveShadow = true;
+            mesh_g2.castShadow = true;
+            mesh_g2.rotation.y= Math.random()*Math.PI
+            scene.add(mesh_g2);
+            centerModeObjects.push(mesh_g2);
+          }
+        }
+      }
+ 
+    }
+ 
+  }
+}else if(center_mode==11){
+  let cylinders_count = map(Math.random(),0,1,4,10);
+  if (Math.random()*100<25) {
+    cylinders_count = 32;
+  }
+  let cube_ratio = 1.2;
+  if (Math.random()*100<25) {
+   cube_ratio = 4;
+  }
+  let height_ratio = map(Math.random(),0,1,1,4);
+  for (let cylinder_item = 0; cylinder_item < cylinders_count; cylinder_item++) {
+    let x = map(Math.random(),0,1,-12,12);
+    let z = map(Math.random(),0,1,-12,6);
+    let s2 = map(Math.random(),0,1,0.5,cube_ratio);
+  let cube_size = 0.5;
+  let cylinder_height = map(Math.random(),0,1,4,20);
+for (let j = 0; j < cylinder_height; j+=cube_size) {
+  let s = map(simplex.noise2D((x+j)/5,z/5),-1,1,0.75,2.5);
+  let cube_geometry = new THREE.BoxGeometry(cube_size/s2*s,cube_size/s2*s,cube_size*0.95*height_ratio);
+  let cube_mesh = new THREE.Mesh(cube_geometry,material);
+  cube_mesh.position.set(x,j+cube_size/2,z);
+  cube_mesh.rotation.y += Math.PI * Math.random()*4;
+  cube_mesh.receiveShadow = true;
+  cube_mesh.castShadow = true;
+  scene.add(cube_mesh)
+  centerModeObjects.push(cube_mesh);
+ 
+}
+ 
+let cube_geometry2 = new THREE.CylinderGeometry(cube_size/12,cube_size/12,cylinder_height*1.2,12,12);
+  let cube_mesh2 = new THREE.Mesh(cube_geometry2,material);
+  cube_mesh2.position.set(x,cylinder_height/2,z);
+  scene.add(cube_mesh2)
+  centerModeObjects.push(cube_mesh2);
+ 
+  }
+ 
+ 
+}else if(center_mode==12){
+  for (let i = 0; i < 6; i++) {
+  let cube_1_g = new THREE.BoxGeometry(2,map(simplex.noise2D(i/12,0),-1,1,16,20),0.5);
+  let cube_mesh = new THREE.Mesh(cube_1_g,material);
+  cube_mesh.position.set(map(simplex.noise2D(i,0),-1,1,-12,12),0,i*2);
+  cube_mesh.rotation.y= Math.random()*Math.PI
+  cube_mesh.receiveShadow = true;
+  cube_mesh.castShadow = true;
+  scene.add(cube_mesh);
+  centerModeObjects.push(cube_mesh);
+  }
+ 
+  let sphere_size = map(Math.random(), 0, 1, 0.5, 1);
+  let spheres_count = map(Math.random(), 0, 1, 4, 10);
+  let sphere_y_offset = Math.random() * 4.5 - 0.5;
+  for (var i = 0; i < spheres_count; i++) {
+    let new_sphere_size = map(
+      i,
+      0,
+      spheres_count,
+      sphere_size / spheres_count,
+      sphere_size
+    );
+    const sphereGeometry = new THREE.SphereGeometry(new_sphere_size, 132, 132);
+    const sphereMesh = new THREE.Mesh(sphereGeometry, material);
+    sphereMesh.receiveShadow = true;
+    sphereMesh.castShadow = true;
+    sphereMesh.position.set(
+      map(Math.random(), 0, 1, -5, 5),
+      sphere_y_offset,
+      x_center +
+        sphere_size * 2 +
+        (i + 1) * (new_sphere_size * 1.5) -
+        sphere_size*2
+    );
+    scene.add(sphereMesh);
+    centerModeObjects.push(sphereMesh);
+  }
+ 
+ 
+ 
+}else if(center_mode==13){
+  let x_c = map(Math.random(),0,1,-2,2);
+  let y_c = map(Math.random(),0,1,6,10);
+  let r =  map(Math.random(),0,1,3,7)*1.5;
+  let rotation_mode = parseInt(Math.random()*100);
+  let index_j = 0;
+  let torus_count = map(Math.random(),0,1,2,5);
+  let r2_min = r/map(Math.random(),0,1,8,2);
+  for (let r2 = r2_min; r2 < r; r2+=r/torus_count) {
+    const group = new THREE.Group();
+    let torusGeometry = new THREE.TorusGeometry(r2, 0.2, 16, 100);
+    let torus = new THREE.Mesh(torusGeometry, material);
+    torus.position.set(x_c, y_c, 0);
+    torus.receiveShadow = true;
+  torus.castShadow = true;
+    group.add(torus);
+    index_j+=1;
+    for (let i = 0; i < 12; i++) {
+      let g = new THREE.SphereGeometry((r2/torus_count)/ map(simplex.noise2D(i/2,0),-1,1,1.5,4),32,32);
+      let g_mesh = new THREE.Mesh(g,material);
+      let a =  map(simplex.noise2D(i/1,index_j/4),-1,1,0,Math.PI*4);
+      g_mesh.position.set(x_c + r2 * Math.sin(a), y_c + r2 * Math.cos(a), 0);
+      g_mesh.receiveShadow = true;
+      g_mesh.castShadow = true;
+      group.add(g_mesh); 
+    }
+    if (rotation_mode<50) {
+ group.rotation.y += map(simplex.noise2D(map(simplex.noise2D(index_j/14,0),-1,1,-12,12)*2,0),-1,1,-Math.PI/2,Math.PI/2);
+    }
+  scene.add(group)
+  centerModeObjects.push(group);
+ 
+  }
+  let g = new THREE.SphereGeometry(r2_min/(map(Math.random(),0,1,1,2.5)),32,32);
+  let g_mesh = new THREE.Mesh(g,material);
+  g_mesh.position.set(x_c,y_c, 0);
+  g_mesh.receiveShadow = true;
+  g_mesh.castShadow = true;
+  scene.add(g_mesh)
+  centerModeObjects.push(g_mesh);
+ 
+ 
+ 
+}else if(center_mode==14){
+ 
+let x_offset = map(Math.random(),0,1,-4,4);
+ 
+let r = 8;
+let h = r *1.2;
+ 
+let y_offset = map(Math.random(),0,1,-r/12,r/12);
+ 
+  let pyramid_g = new THREE.ConeGeometry(r/2,r/1,4,24);
+  let pyramid_mesh = new THREE.Mesh(pyramid_g,material);
+  pyramid_mesh.position.set(x_offset+plr2,y_offset+r/2,0);
+  pyramid_mesh.rotation.x = Math.PI;
+  pyramid_mesh.receiveShadow = false;
+  pyramid_mesh.castShadow = true;
+  scene.add(pyramid_mesh);
+  centerModeObjects.push(pyramid_mesh);
+  let pyramid_g2 = new THREE.ConeGeometry(r/2,r/map(Math.random(),0,1,1.2,2),4,24);
+  let pyramid_mesh2 = new THREE.Mesh(pyramid_g2,material);
+  pyramid_mesh2.position.set(x_offset+plr2,y_offset+r*1.4,0);
+  pyramid_mesh2.receiveShadow = false;
+  pyramid_mesh2.castShadow = true;
+  scene.add(pyramid_mesh2);
+  centerModeObjects.push(pyramid_mesh2);
+    const tetraSize = r / 3;
+    const taperFactor = 0.5;
+    const elongationFactor = 10;
+    const customTetraGeometry = createThreeFacedTetrahedron(tetraSize, taperFactor);
+    const numberOfCorners = 4;
+    for (let i = 0; i < numberOfCorners; i++) {
+        const angle = (i * Math.PI) / 2; 
+        const x = (r / 1.6) * Math.cos(angle);
+        const z = (r / 2) * Math.sin(angle);
+        const y = 0; 
+ 
+        const tetraMesh = new THREE.Mesh(customTetraGeometry, material);
+ 
+        tetraMesh.position.set(x, y+6, z); 
+        let tiltAxis = new THREE.Vector3(-Math.sin(angle), 0, Math.cos(angle)).normalize();
+ 
+        let randomTiltDegrees = -(Math.random() * 10 +10);
+        let randomTiltRadians = THREE.MathUtils.degToRad(randomTiltDegrees);
+        tetraMesh.rotateOnAxis(tiltAxis, randomTiltRadians);
+ 
+        tetraMesh.scale.set(1, elongationFactor, 1);
+ 
+        tetraMesh.receiveShadow = true;
+        tetraMesh.castShadow = true;
+        pyramid_mesh.add(tetraMesh);
+    }
+ 
+ 
+ 
+let spiral_shape = getRandomElement([2,32,32,32]);
+let numSpheres = parseInt(map(Math.random(),0,1,80,120));
+const spiral_sphereGeometry = new THREE.SphereGeometry(0.5, spiral_shape, spiral_shape);
+ 
+let spiral_radius = r;  
+const heightIncrement = map(Math.random(),0,1,0.2,0.75);  
+const turns = (Math.random()*2)+3;  
+ 
+ 
+for (let i = 0; i < numSpheres; i++) {
+    const theta = (i / numSpheres) * (turns * Math.PI * 2);  
+    const x = x_offset + spiral_radius * Math.cos(theta);  
+    const z = spiral_radius * Math.sin(theta);  
+    const y = heightIncrement * i;   
+    const sphere = new THREE.Mesh(spiral_sphereGeometry, material);
+    sphere.position.set(x+plr2, y, z); 
+    sphere.receiveShadow = true;
+    sphere.castShadow = true;
+    scene.add(sphere);
+    centerModeObjects.push(sphere);
+}
+ 
+camera.position.y+=1;
+ 
+}else if (center_mode == 15) {
+  const sy = Math.random() * 6 + 6;
+  const sx = Math.random() * 10 - 5;
+  const sz = Math.random() * 4 - 2;
+  const r = parseInt(map(Math.random(), 0, 1, 6, 16));
+  let numParticles = 10000;
+  const circlePosition = new THREE.Vector3(sx, sy - 8, sz);
+ 
+  const geometry = new THREE.BufferGeometry();
+  const positions = [];
+ 
+  for (let radius = r / 4; radius < r; radius++) {
+    numParticles += 10000;
+  }
+ 
+  for (let radius = r / 4; radius < r; radius++) {
+    for (let i = 0; i < numParticles; i++) {
+ 
+      const theta = 36 * radius;
+      const phi = (i / numParticles) * Math.PI * 4;
+ 
+      let x = radius * Math.sin(theta) * Math.cos(phi);
+      let y = radius * Math.sin(theta) * Math.sin(phi);
+      let z = radius * Math.cos(theta);
+ 
+      x += simplex.noise2D(y / 14, z / 4) * 4;
+      y += simplex.noise2D(x / 4, y / 14) * 4;
+      z += simplex.noise2D(x / 12, z / 12) * 4;
+ 
+      x += circlePosition.x;
+      y += circlePosition.y;
+      z += circlePosition.z;
+ 
+      z = map(z, 0, radius * Math.cos(Math.PI), -radius * 1, radius * 1);
+ 
+      positions.push(x, y, z);
+    }
+  }
+ 
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+ 
+  const groupCount = 5; 
+  const sizeSettings = []; 
+  const pointsGroups = [];  
+ 
+  for (let g = 0; g < groupCount; g++) {
+    pointsGroups[g] = [];
+    sizeSettings[g] = (0.015 + g * 0.05); 
+  }
+  const positionsArray = geometry.attributes.position.array;
+  for (let j = 0; j < positionsArray.length; j += 3) {
+    const x = positionsArray[j];
+    const y = positionsArray[j + 1];
+    const z = positionsArray[j + 2];
+    const dx = x - circlePosition.x;
+    const dy = y - circlePosition.y;
+    const dz = z - circlePosition.z;
+    const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    const groupIndex = Math.min(
+      Math.floor((distance / r) * groupCount),
+      groupCount - 1
+    );
+ 
+    pointsGroups[groupIndex].push(x, y, z);
+  }
+  const particleSystems = [];
+  for (let g = 0; g < groupCount; g++) {
+    const groupGeometry = new THREE.BufferGeometry();
+    groupGeometry.setAttribute('position', new THREE.Float32BufferAttribute(pointsGroups[g], 3));
+    const material = new THREE.PointsMaterial({
+      size: sizeSettings[g],
+      color: material_color,
+      sizeAttenuation: true
+    }); 
+    const particleSystem = new THREE.Points(groupGeometry, material)
+    particleSystem.receiveShadow = true;
+    particleSystem.castShadow = true;
+    particleSystems.push(particleSystem);
+  }
+  const sphereGeometry = new THREE.SphereGeometry(map(Math.random(), 0, 1, 2, 4), 32, 32);
+  const sphereMaterial = new THREE.MeshStandardMaterial({
+  color: material_color,
+  emissive: material_color,
+  emissiveIntensity: 2.0,
+  roughness: 2,
+  metalness: 1
+});
+ 
+  const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+  sphere.position.set(sx, sy, sz);
+ 
+  particleSystems.forEach(pSystem => {
+    sphere.add(pSystem);
+  });
+  sphere.receiveShadow = true;
+  sphere.castShadow = true
+  scene.add(sphere);
+  centerModeObjects.push(sphere);
+}
+else if (center_mode==16){
+ 
+  let surface_count = parseInt(map(Math.random(), 0, 1, 4, 14));
+  let pyramid_size = parseInt(map(Math.random(), 0, 1, 8, 14));
+  let surface_height = pyramid_size / surface_count;
+ 
+ 
+  let pyramidGroup = new THREE.Group();
+  let randomRotationMode = Math.random() < 0.5; 
+ 
+  for (let i = 0; i < surface_count; i++) {
+    let scale_factor = map(i, 0, surface_count - 1, 1, 0.1);
+    let surface_geometry = new THREE.BoxGeometry(
+      pyramid_size * scale_factor,
+      surface_height,
+      pyramid_size * scale_factor
+    ); 
+    let surface_mesh = new THREE.Mesh(surface_geometry, material);
+    surface_mesh.position.set(0, i * surface_height, map(pyramid_size, 8, 16, 4, -4)); 
+    if (randomRotationMode) {
+      surface_mesh.rotation.y = Math.random() * Math.PI * 2; 
+    } 
+    surface_mesh.receiveShadow = true;
+    surface_mesh.castShadow = true;
+    pyramidGroup.add(surface_mesh);
+  }
+ 
+  let sphere_pyramid_size = pyramid_size/6.5;
+  if (Math.random()<0.1) {
+    sphere_pyramid_size = pyramid_size/2.5;
+  }
+  const pyramid_sphere_geometry = new THREE.SphereGeometry(sphere_pyramid_size, 128, 128);
+  const pyramid_sphere_mesh = new THREE.Mesh(pyramid_sphere_geometry, material);
+  pyramid_sphere_mesh.position.set(0,pyramid_size+sphere_pyramid_size/2+map(Math.random(),0,1,sphere_pyramid_size/4,sphere_pyramid_size/2),0);
+  pyramid_sphere_mesh.receiveShadow = true;
+  pyramid_sphere_mesh.castShadow = true;
+  scene.add(pyramidGroup);
+  centerModeObjects.push(pyramidGroup);
+  scene.add(pyramid_sphere_mesh);
+  centerModeObjects.push(pyramid_sphere_mesh);
+
+  let sphere_pyramid_2_count =  Math.random()*100+120;
+  for (let j = 0; j < sphere_pyramid_2_count; j++) {
+    let pyramid_sphere_geometry2 = new THREE.SphereGeometry(0.55, 128, 128);
+    let pyramid_sphere_mesh2 = new THREE.Mesh(pyramid_sphere_geometry2, material);
+    pyramid_sphere_mesh2.receiveShadow = true;
+    pyramid_sphere_mesh2.castShadow = true
+    let a = Math.random()*Math.PI;
+    let noise_y = map(simplex.noise2D(pyramid_size*Math.sin(a)/10,pyramid_size*Math.cos(a)/10),-1,1,0,pyramid_size);
+    pyramid_sphere_mesh2.position.set(pyramid_size*Math.sin(a),noise_y,pyramid_size*Math.cos(a));
+    pyramidGroup.add(pyramid_sphere_mesh2);
+  }
+ 
+ 
+  if (!randomRotationMode) {
+    pyramidGroup.rotation.y = Math.random() * Math.PI * 2; 
+  }
+ 
+ 
+}else if (center_mode==17){
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.7); 
+scene.add(ambientLight);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+directionalLight.position.set(5, 10, 5);
+scene.add(directionalLight);
+let cGroup = new THREE.Group();
+let rot=Math.random()*Math.PI
+let randomz= Math.random() * 8 + 12 
+for (let i = 0; i < 500; i++) { 
+    const x = Math.random() * 19 - 10;
+    const z = Math.random() * 19 - randomz; 
+    const distance = Math.sqrt(x * x + z * z); 
+    const size_x = Math.random() * 2 + 0.5; 
+    const size_z = Math.random() * 2 + 0.5;  
+    const size_y = 10 / (distance + 1)  * map(distance,0,Math.sqrt(size_x*size_x + size_z*size_z)*2,2.2,2); 
+    const geometry = new THREE.BoxGeometry(size_x* map(distance,0,Math.sqrt(size_x*size_x + size_z*size_z)*2,0.1,1), size_y/2, size_z* map(distance,0,Math.sqrt(size_x*size_x + size_z*size_z)*2,0.1,1));
+    const cube = new THREE.Mesh(geometry, material);
+    cube.position.set(x+plr2, size_y / 2, z+plr2); 
+    cube.castShadow=true;
+    cube.receiveShadow=true; 
+    cube.rotation.y=rot
+    cGroup.add(cube)
+}
+ 
+let spiral_shape = getRandomElement([2,32,32,32]);
+let numSpheres = parseInt(map(Math.random(),0,1,80,120));
+const spiral_sphereGeometry = new THREE.SphereGeometry(0.5, spiral_shape, spiral_shape);
+ 
+let spiral_radius = map(Math.random(),0,1,10,20);  
+let spiral_z_offset = map(Math.random(),0,1,10,50);
+const heightIncrement = map(Math.random(),0,1,0.2,0.75)*3.2;  
+const turns =  map(Math.random(),0,1,2,6);  
+ 
+ 
+for (let i = 0; i < numSpheres; i++) {
+    const theta = (i / numSpheres) * (turns * Math.PI * 2);  
+    const x = 0 + spiral_radius * Math.cos(theta);  
+    const z = spiral_radius * Math.sin(theta);  
+    const y = heightIncrement * i;  
+ 
+ 
+    const sphere = new THREE.Mesh(spiral_sphereGeometry, material);
+    sphere.position.set(x+plr2, y, z-spiral_z_offset+plr2+10);
+ 
+    sphere.castShadow=true;
+    sphere.receiveShadow=true;
+    sphere.rotation.y=rot 
+    cGroup.add(sphere);
+}
+scene.add(cGroup);
+centerModeObjects.push(cGroup);
+
+}else if (center_mode==18){
+  let cylinders_count = parseInt(map(Math.random(),0,1,18,38));
+  for (let i = 0; i < cylinders_count; i++) {
+    let x = map(Math.random(),0,1,-16,16);
+    let z = map(Math.random(),0,1,-8,-2);
+    let y = 0;
+    let cylinder_radius = map(Math.random(),0,1,0.2,1.5);
+    let cylinder_height = map(Math.random(),0,1,1,12);
+ 
+    let cylinder_geometry = new THREE.CylinderGeometry(cylinder_radius,cylinder_radius,cylinder_height,32,32);
+    let cylinder_mesh = new THREE.Mesh(cylinder_geometry,material);
+    cylinder_mesh.position.set(x,cylinder_height/2,z)
+    cylinder_mesh.castShadow=true;
+    cylinder_mesh.receiveShadow=true;
+    scene.add(cylinder_mesh);
+    centerModeObjects.push(cylinder_mesh);
+
+    let sphere_cylinder = new THREE.SphereGeometry(cylinder_radius,32,32);
+    let cylinder_sphere_mesh = new THREE.Mesh(sphere_cylinder,material);
+    cylinder_sphere_mesh.position.set(x,cylinder_height,z)
+    cylinder_sphere_mesh.castShadow=true;
+    cylinder_sphere_mesh.receiveShadow=true;
+    scene.add(cylinder_sphere_mesh);
+    centerModeObjects.push(cylinder_sphere_mesh); 
+     x = map(Math.random(),0,1,-16,16);
+     z = map(Math.random(),0,1,-2,2);
+     y = 0;
+     let sphere_radius = map(simplex.noise2D(x/2,z/10),-1,1,0.5,3.2);
+ 
+    let sphere_cylinder2 = new THREE.SphereGeometry(sphere_radius,100,100);
+    let cylinder_sphere_mesh2 = new THREE.Mesh(sphere_cylinder2,material);
+    cylinder_sphere_mesh2.position.set(x,0,z)
+    cylinder_sphere_mesh2.castShadow=true;
+    cylinder_sphere_mesh2.receiveShadow=true;
+    scene.add(cylinder_sphere_mesh2);
+    centerModeObjects.push(cylinder_sphere_mesh2);  
+  }
+ 
+} else if (center_mode == 19) {
+  const spiralGroup = new THREE.Group();
+  const spiralCount = Math.floor(map(Math.random(), 0, 1, 4, 10));
+  const baseRadius = map(Math.random(), 0, 1, 10, 20);
+  const tubeRadius = map(Math.random(), 0, 1, 0.2, 1);
+  let rotat= Math.random()*1
+ 
+  for (let i = 0; i < spiralCount; i++) {
+    let torusGeometry = new THREE.TorusGeometry(
+      baseRadius - i * 2,   
+      tubeRadius, 
+      16, 
+      60
+    );
+    let torus = new THREE.Mesh(torusGeometry, material);
+    torus.rotation.x = Math.PI / 2;
+    torus.rotation.y = i * rotat;
+    torus.position.y = i * (tubeRadius * 4);
+    torus.receiveShadow = true;
+    torus.castShadow = true;
+    spiralGroup.add(torus);
+  }
+ 
+  spiralGroup.position.set(
+    map(Math.random(), 0, 1, -10, 10),
+    map(Math.random(), 0, 1, 3, 10),
+    map(Math.random(), 0, 1, -35, 0)
+  );
+  scene.add(spiralGroup);
+  centerModeObjects.push(spiralGroup);  
+
+} else if (center_mode == 1) {
+  const clusterGroup = new THREE.Group();
+  const cubeCount = Math.floor(map(Math.random(), 0, 1, 20, 50));
+  const clusterRadius = map(Math.random(), 0, 1, 5, 12);
+ 
+  for (let i = 0; i < cubeCount; i++) {
+    let size = map(Math.random(), 0, 1, 0.5, 3);
+    const cubeGeometry = new THREE.BoxGeometry(size, size, size);
+    const cube = new THREE.Mesh(cubeGeometry, material);
+ 
+    const theta = Math.random() * 2 * Math.PI;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const r = clusterRadius * Math.cbrt(Math.random());
+    cube.position.set(
+      r * Math.sin(phi) * Math.cos(theta),
+      r * Math.sin(phi) * Math.sin(theta),
+      r * Math.cos(phi)
+    );
+ 
+    cube.rotation.set(
+      Math.random() * Math.PI,
+      Math.random() * Math.PI,
+      Math.random() * Math.PI
+    );
+    cube.castShadow = true;
+    cube.receiveShadow = true;
+    clusterGroup.add(cube);
+  }
+ 
+  clusterGroup.position.set(
+    map(Math.random(), 0, 1, -10, 10),
+    map(Math.random(), 0, 1, 0, 10),
+    map(Math.random(), 0, 1, -15, 5)
+  );
+  scene.add(clusterGroup);
+  centerModeObjects.push(clusterGroup);  
+
+}else if (center_mode == 20) {
+  const clusterRadius = map(Math.random(), 0, 1, 5, 12);
+  const sphereCount = Math.floor(map(Math.random(), 0, 1, 20, 30));
+  const sphereGroup = new THREE.Group();
+ 
+  for (let i = 0; i < sphereCount; i++) {
+    const baseRadius = map(Math.random(), 0, 1, 0.5, 2);
+    const baseGeometry = new THREE.SphereGeometry(baseRadius, 64, 64);
+ 
+    const positionAttribute = baseGeometry.attributes.position;
+    const vertex = new THREE.Vector3();
+ 
+    for (let j = 0; j < positionAttribute.count; j++) {
+      vertex.fromBufferAttribute(positionAttribute, j);
+      const noiseFactor = simplex.noise3D(vertex.x * 1.0, vertex.y * 1.0, vertex.z * 1.0);
+      vertex.multiplyScalar(1 + noiseFactor * 0.15);
+      positionAttribute.setXYZ(j, vertex.x, vertex.y, vertex.z+10);
+    }
+ 
+    baseGeometry.computeVertexNormals();
+ 
+    const sphereMesh = new THREE.Mesh(baseGeometry, material);
+ 
+    const theta = Math.random() * 2 * Math.PI;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const r = clusterRadius * Math.cbrt(Math.random());
+ 
+    sphereMesh.position.set(
+      r * Math.sin(phi) * Math.cos(theta),
+      r * Math.sin(phi) * Math.sin(theta),
+      r * Math.cos(phi)
+    );
+ 
+    sphereMesh.rotation.set(
+      Math.random() * 2 * Math.PI,
+      Math.random() * 2 * Math.PI,
+      Math.random() * 2 * Math.PI
+    );
+ 
+    sphereMesh.castShadow = true;
+    sphereMesh.receiveShadow = true;
+ 
+    sphereGroup.add(sphereMesh);
+  }
+ 
+  sphereGroup.rotation.x = Math.random() * 2 * Math.PI;
+  sphereGroup.rotation.y = Math.random() * 2 * Math.PI;
+  sphereGroup.rotation.z = Math.random() * 2 * Math.PI;
+ 
+  scene.add(sphereGroup);
+  centerModeObjects.push(sphereGroup);  
+
+}
+ 
+function createThreeFacedTetrahedron(tetraSize, taperFactor) {
+  const geometry = new THREE.BufferGeometry();
+  const vertices = new Float32Array([
+      0, 0, 0,
+      tetraSize * taperFactor, -1, 0,
+      -tetraSize * taperFactor, -1, 0,
+      0, -1, tetraSize * taperFactor
+  ]);
+  const indices = [
+      0, 1, 3, 
+      0, 3, 2, 
+      0, 2, 1  
+  ];
+  geometry.setIndex(indices);
+  geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+  geometry.computeVertexNormals(); 
+ 
+  return geometry;
+}
+  const light2 = new THREE.DirectionalLight(0xffffff, 6);
+  light2.position.set(0, 20,0);
+  scene.add(light2);
+ 
+  light2.shadow.mapSize.width = 1024;
+  light2.shadow.mapSize.height = 1024;
+  light2.shadow.camera.near = 1;
+  light2.shadow.camera.far = 500;
+  light2.receiveShadow = false;
+ 
+
+
+if(center_mode==10||center_mode==12||center_mode==11){
+  const light3 = new THREE.DirectionalLight(0xffffff, 6);
+  light3.position.set(0, -100, 50);
+  scene.add(light3);
+  light3.shadow.mapSize.width = 1024;
+  light3.shadow.mapSize.height = 1024;
+  light3.shadow.camera.near = 1;
+  light3.shadow.camera.far = 500;
+  light3.receiveShadow = false;
+  light3.castShadow = false;
+ 
+}
+ 
+const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0xeeeeee, 5);
+scene.add(hemisphereLight);
+const light = new THREE.DirectionalLight(0xffffff, 25);
+
+let xl;
+let zl;
+if (activeSphere) {
+  xl = activeSphere.position.x; 
+  zl = map(circle_size_offset, 0.45, 4, -100, -40); 
+} else {
+  if ([13, 18, 5, 10, 11, 14, 17, 16].includes(center_mode)) {
+    xl = Math.random() < 0.5 
+      ? (Math.random() * 200) - 300 
+      : (Math.random() * 200) + 100;
+  } else {
+    xl = Math.random() < 0.25 
+      ? (Math.random() * 600) - 300
+      : 0;
+  }
+  zl = (-Math.random()*40)-20
+}
+
+const yl = 100; 
+light.position.set(xl, yl, -100);
+light.shadow.mapSize.width = 1024;
+light.shadow.mapSize.height = 1024;
+light.shadow.camera.left = -50;
+light.shadow.camera.right = 50;
+light.shadow.camera.top = 50;
+light.shadow.camera.bottom = -10;
+light.shadow.camera.near = 1;
+light.shadow.camera.far = 500;
+light.shadow.bias = -0.0005; 
+light.castShadow = true;
+ 
+scene.add(light);
+renderer.render(scene, camera);
+const renderTarget = new THREE.WebGLRenderTarget(1024, 1024, {
+});
+
+
+const imgData = renderer.domElement.toDataURL();
+let plane_index = 1000;
+
+renderer.render(scene, camera);
+let frame_index = 0;
+
+Math.random = function() {
+  return THREE.MathUtils.seededRandom();
+};
+
+switch (color_mode) {
+  case 1:
+    material_color = 0xcfcccc;
+    break;
+  case 2:
+  case 10: {
+    const baseColor = (color_mode === 2) ? 0xFFA9A9 : 0xFF9696;
+    let colors_ratio_array = [1, 1, 1];
+    const randomIndex1 = Math.floor(Math.random() * 3);
+    let randomIndex2;
+    do {
+      randomIndex2 = Math.floor(Math.random() * 3);
+    } while (randomIndex2 === randomIndex1);
+    colors_ratio_array[randomIndex1] = 2;
+    colors_ratio_array[randomIndex2] = 2;
+    
+    const baseR = (baseColor >> 16) & 0xff;
+    const baseG = (baseColor >> 8) & 0xff;
+    const baseB = baseColor & 0xff;
+    
+    const r = Math.floor(baseR / colors_ratio_array[0]);
+    const g = Math.floor(baseG / colors_ratio_array[1]);
+    const b = Math.floor(baseB / colors_ratio_array[2]);
+    
+    material_color = (r << 16) | (g << 8) | b;
+    break;
+  }
+  
+  case 3:
+    material_color = 0x4A4BA3;
+    break;
+    
+  case 4:
+    material_color = 0xdb2a2a;
+    break;
+    
+  case 5:
+    material_color = 0x4d33ff;
+    break;
+    
+  case 6:
+    material_color = 0xcfcf27;
+    break;
+    
+  case 7:
+    material_color = 0x8f8f8f;
+    break;
+    
+  case 8:
+    material_color = 0x80ed80;
+    break;
+    
+  case 9:
+    material_color = 0x993399;
+    break;
+    
+  case 11:
+    material_color = 0x28d1b3;
+    break;
+    
+  default:
+    material_color = 0xffffff;
+    break;
+}
+
+console.log("color_mode:", color_mode);
+console.log("material_color:", material_color.toString(16));
+
+
+ composer = new EffectComposer(renderer); 
+ composer.addPass(new RenderPass(scene, camera));
+
+const afterimagePass = new AfterimagePass(0.85);
+composer.addPass(afterimagePass);
+
+const ColorFilterShader = {
+    uniforms: {
+        "tDiffuse": { value: null },
+        "color": { value: new THREE.Color(material_color) },
+        "strength": { value: 0.5 }
+    },
+    vertexShader: `
+        varying vec2 vUv;
+        void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+    `,
+    fragmentShader: `
+        uniform sampler2D tDiffuse;
+        uniform vec3 color;
+        uniform float strength;
+        varying vec2 vUv;
+
+        void main() {
+            vec4 texColor = texture2D(tDiffuse, vUv);
+            vec3 blended = mix(texColor.rgb, color, strength);
+            gl_FragColor = vec4(blended, texColor.a);
+        }
+    `
+};
+
+const colorFilterPass = new ShaderPass(ColorFilterShader);
+composer.addPass(colorFilterPass);
+// Assuming you already have your composer set up:
+const filmPass = new FilmPass(
+  0.35,   // noise intensity (grain amount)
+  0.025,  // scanline intensity (set to 0 if you only want grain)
+  648,    // number of scanlines (adjust as needed)
+  false   // grayscale mode (set to true if desired)
+);
+composer.addPass(filmPass);
+
+// Assume your OutlinePass is defined and added as follows:
+const outlinePass = new OutlinePass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  scene,
+  camera
+);
+outlinePass.edgeStrength = 0.7;
+outlinePass.edgeGlow = 3.5;
+outlinePass.edgeThickness = 0.2;
+outlinePass.visibleEdgeColor.set('#ffffff'); // white outline
+outlinePass.hiddenEdgeColor.set('#000000');  // dark color for occluded edges
+outlinePass.selectedObjects = centerModeObjects;
+composer.addPass(outlinePass);
+
+// Add toggle logic for the halo effect:
+let haloEnabled = true;
+const haloToggle = document.getElementById('haloToggle');
+haloToggle.addEventListener('click', function() {
+  haloEnabled = !haloEnabled;
+  outlinePass.enabled = haloEnabled;
+  // When halo is enabled, show "Halo On"; when disabled, "Halo Off".
+  haloToggle.textContent = haloEnabled ? "Halo On" : "Halo Off";
+});
+
+
+
+function updateColorFilter(newColor) {
+    material_color = newColor;
+    colorFilterPass.uniforms.color.value.set(newColor);
+}
+
+const keysPressed = {};
+const moveSpeed = 0.2; // Adjust as needed
+const areaLimit = 25;  // Half of the 50x50 area
+let moveInterval = null;
+
+function startMoving(direction) {
+    stopMoving(); // Stop any previous movement
+    moveInterval = setInterval(() => {
+        if (direction === "up") camera.position.z -= moveSpeed;
+        if (direction === "down") camera.position.z += moveSpeed;
+        if (direction === "left") camera.position.x -= moveSpeed;
+        if (direction === "right") camera.position.x += moveSpeed;
+
+        // Keep camera within movement bounds
+        const scale = scene.scale.x;
+        const xLimit = 25 * scale;
+        const zLimit = 35 * scale;
+        camera.position.x = Math.max(-xLimit, Math.min(xLimit, camera.position.x));
+        camera.position.z = Math.max(0, Math.min(zLimit, camera.position.z));
+    }, 16); // Runs ~60 FPS
+}
+
+function stopMoving() {
+    if (moveInterval) clearInterval(moveInterval);
+}
+
+// Map arrow buttons to their corresponding keys:
+const arrowMapping = {
+  moveUp: 'w',
+  moveDown: 's',
+  moveLeft: 'a',
+  moveRight: 'd'
+};
+
+// For each button, update keysPressed directly.
+Object.keys(arrowMapping).forEach(id => {
+  const key = arrowMapping[id];
+  const btn = document.getElementById(id);
+
+  // When the button is pressed:
+  btn.addEventListener('mousedown', () => { keysPressed[key] = true; });
+  btn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    keysPressed[key] = true;
+  }, { passive: false });
+
+  // When the button is released:
+  btn.addEventListener('mouseup', () => { keysPressed[key] = false; });
+  btn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    keysPressed[key] = false;
+  }, { passive: false });
+  btn.addEventListener('mouseleave', () => { keysPressed[key] = false; });
+});
+
+document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+// Get the toolbar and arrow controls elements
+const toolbar = document.getElementById("toolbar");
+const arrowControls = document.getElementById("arrowControls");
+
+function updateArrowsVisibility() {
+  if (window.innerWidth < 768) {
+    // On mobile, always show the arrows and save button
+    arrowControls.style.display = "flex";
+    saveBtn.classList.remove("hidden-when-toolbar-minimized");
+  } else {
+    if (toolbar.classList.contains("minimized")) {
+      arrowControls.style.display = "none";
+      saveBtn.classList.add("hidden-when-toolbar-minimized");
+    } else {
+      arrowControls.style.display = "flex";
+      saveBtn.classList.remove("hidden-when-toolbar-minimized");
+    }
+  }
+}
+
+
+// When clicking or touching on the toolbar (but not on a button), toggle minimized state
+function toggleToolbar() {
+  // Toggle the "minimized" class
+  toolbar.classList.toggle("minimized");
+  updateArrowsVisibility();
+}
+
+toolbar.addEventListener("click", (e) => {
+  // Do not toggle if the click is on a button or an input element
+  if (!e.target.closest("button") && !["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName)) {
+    toggleToolbar();
+  }
+});
+
+toolbar.addEventListener("touchend", (e) => {
+  if (!e.target.closest("button") && !["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName)) {
+    e.preventDefault();
+    toggleToolbar();
+  }
+});
+
+
+
+
+
+window.addEventListener('keydown', (e) => {
+  // If focus is on an input, do nothing
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  keysPressed[e.key.toLowerCase()] = true;
+  if (e.key.toLowerCase() === 'r') {
+    saveCanvasImage();
+  }
+  if (e.key.toLowerCase() === 't') {
+    toggleToolbar();
+  }
+});
+
+window.addEventListener('keyup', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  keysPressed[e.key.toLowerCase()] = false;
+  
+});
+
+
+function updateCameraMovement() {
+  // Update camera position based on WASD keys:
+  if (keysPressed['w']) camera.position.z -= moveSpeed;
+  if (keysPressed['s']) camera.position.z += moveSpeed;
+  if (keysPressed['a']) camera.position.x -= moveSpeed;
+  if (keysPressed['d']) camera.position.x += moveSpeed;
+  
+  // Multiply the limits by the scene's current scale (assumed uniform, so scene.scale.x)
+  const scale = scene.scale.x;
+  const xLimit = 25 * scale;
+  const zLimit = 35 * scale;
+  
+  camera.position.x = Math.max(-xLimit, Math.min(xLimit, camera.position.x));
+  camera.position.z = Math.max(0, Math.min(zLimit, camera.position.z));
+}
+
+
+// Define contrast shader pass
+const ContrastShader = {
+  uniforms: {
+    tDiffuse: { value: null },
+    contrast: { value: 1.2 }
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform sampler2D tDiffuse;
+    uniform float contrast;
+    varying vec2 vUv;
+    void main() {
+      vec4 color = texture2D(tDiffuse, vUv);
+      color.rgb = ((color.rgb - 0.5) * contrast) + 0.5;
+      gl_FragColor = color;
+    }
+  `
+};
+
+const contrastPass = new ShaderPass(ContrastShader);
+contrastPass.uniforms.contrast.value = 1.3; // Increase or decrease to taste
+composer.addPass(contrastPass);
+
+// Add toggle logic for the view mode button (for now it only changes text):
+let viewMode = "classic";  // initial state: Classic View
+const viewToggle = document.getElementById('viewToggle');
+viewToggle.addEventListener('click', function() {
+  viewMode = (viewMode === "classic") ? "real" : "classic";
+  viewToggle.textContent = (viewMode === "classic") ? "Classic View" : "Human View";
+  
+  if (viewMode === "real") {
+    camera.fov = 90; // a wider angle so the camera seems "smaller"
+    camera.far = 5000; 
+    camera.updateProjectionMatrix();
+    scene.scale.set(3.2, 3.2, 3.2);
+    if (circle1) circle1.scale.set(1.6, 1.6, 1.6);
+    if (circle2) circle2.scale.set(1.6, 1.6, 1.6);
+    if (circle && !circle1 && !circle2) circle.scale.set(1.6, 1.6, 1.6);
+  } else {
+    camera.fov = 75;
+    camera.far = 1000;
+    camera.updateProjectionMatrix();
+    scene.scale.set(1, 1, 1);
+    if (circle1) circle1.scale.set(1, 1, 1);
+    if (circle2) circle2.scale.set(1, 1, 1);
+    if (circle && !circle1 && !circle2) circle.scale.set(1, 1, 1);
+  }
+});
+
+const canvasWrapper = document.querySelector('.canvas-wrapper');
+canvasWrapper.addEventListener('touchmove', function(e) {
+  e.preventDefault();
+}, { passive: false });
+
+const loadingScreen = document.getElementById('loading');
+      if (loadingScreen) {
+        loadingScreen.remove();
+      }
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    targetX += (mouseX - targetX) * 0.02;
+    targetY += (mouseY - targetY) * 0.02;
+
+    targetX += ((useGyro ? gyroX : mouseX) - targetX) * 0.05;
+    targetY += ((useGyro ? gyroY : mouseY) - targetY) * 0.05;
+
+    targetY += Math.sin(frame_index/150)/750;
+    const maxAngle = Math.PI / 6;
+    camera.rotation.y = THREE.MathUtils.clamp(-targetX * maxAngle, -maxAngle, maxAngle);
+    camera.rotation.x = THREE.MathUtils.clamp(-targetY * maxAngle, -maxAngle, maxAngle);
+
+    updateCameraMovement();
+    if (circle1) circle1.lookAt(camera.position);
+if (circle2) circle2.lookAt(camera.position);
+if (circle) circle.lookAt(camera.position);
+
+
+
+    composer.render();
+    frame_index+=1;
+}
+
+animate();
+    </script>
+
+
+  </body>
+</html>
