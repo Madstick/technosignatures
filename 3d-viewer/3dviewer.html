@@ -2185,7 +2185,9 @@ const ContrastShader = {
 const contrastPass = new ShaderPass(ContrastShader);
 contrastPass.uniforms.contrast.value = 1.3; // Increase or decrease to taste
 composer.addPass(contrastPass);
-
+if (isMobile) {
+    composer.passes = composer.passes.filter(pass => !(pass instanceof FilmPass || pass instanceof OutlinePass));
+}
 // Add toggle logic for the view mode button (for now it only changes text):
 let viewMode = "classic";  // initial state: Classic View
 const viewToggle = document.getElementById('viewToggle');
