@@ -2206,9 +2206,6 @@ const loadingScreen = document.getElementById('loading');
       if (loadingScreen) {
         loadingScreen.remove();
       }
-      if (isMobile) {
-    composer.passes = composer.passes.filter(pass => !(pass instanceof FilmPass || pass instanceof OutlinePass));
-}
 
 function animate() {
     requestAnimationFrame(animate);
