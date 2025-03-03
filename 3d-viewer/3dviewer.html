@@ -474,7 +474,7 @@ let targetX = 0;
 let targetY = 0;
 let gyroX = 0, gyroY = 0;
 let useGyro = false;
-
+const isMobile = /Mobi|Android/i.test(navigator.userAgent);
 document.addEventListener("mousemove", (event) => {
     const halfWidth = window.innerWidth / 2;
     const halfHeight = window.innerHeight / 2;
@@ -483,12 +483,21 @@ document.addEventListener("mousemove", (event) => {
     mouseY = (event.clientY - halfHeight) / halfHeight;
 });
 
-window.addEventListener("deviceorientation", (event) => {
-    useGyro = true;
+let lastGyroUpdate = 0;
+function handleOrientation(event) {
+    const now = performance.now();
+    if (now - lastGyroUpdate < 100) return;  // Limit to 10 updates/sec
+    lastGyroUpdate = now;
 
-    gyroX = event.gamma / 30;
-    gyroY = event.beta / 30;
-});
+    let xRotation = event.beta;  // Up/Down tilt (-180 to 180)
+    let yRotation = event.gamma; // Left/Right tilt (-90 to 90)
+
+    let object = document.getElementById("someElement"); 
+    object.style.transform = `rotateX(${xRotation}deg) rotateY(${yRotation}deg)`;
+}
+
+window.addEventListener("deviceorientation", handleOrientation, true);
+
 
 
  
@@ -580,7 +589,13 @@ renderer.setSize(900 * dpr, 900 * dpr, false);
 renderer.domElement.style.width = '100%';
 renderer.domElement.style.height = '100%';
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+if (isMobile) {
+  renderer.shadowMap.type = THREE.BasicShadowMap;
+} else {
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+}
+
 scene.background = new THREE.Color(0x808080);
 document.querySelector('.canvas-wrapper').appendChild(renderer.domElement);
 
@@ -2206,6 +2221,7 @@ const loadingScreen = document.getElementById('loading');
       if (loadingScreen) {
         loadingScreen.remove();
       }
+
 
 function animate() {
     requestAnimationFrame(animate);
