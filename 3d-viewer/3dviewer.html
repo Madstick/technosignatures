@@ -575,8 +575,10 @@ const renderer = new THREE.WebGLRenderer({ antialias: true,preserveDrawingBuffer
 renderer.physicallyCorrectLights = true; 
 renderer.outputEncoding = THREE.sRGBEncoding;
 
-const dpr = window.devicePixelRatio || 1;
-renderer.setSize(900 * dpr, 900 * dpr, false);
+
+const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+const dpr = isMobile ? 0.6 : window.devicePixelRatio || 1;
+renderer.setPixelRatio(dpr);
 renderer.domElement.style.width = '100%';
 renderer.domElement.style.height = '100%';
 renderer.shadowMap.enabled = true;
@@ -2207,8 +2209,15 @@ const loadingScreen = document.getElementById('loading');
         loadingScreen.remove();
       }
 
-function animate() {
-    requestAnimationFrame(animate);
+      let lastFrameTime = 0;
+const targetFPS = isMobile ? 30 : 60;  // Reduce FPS on mobile
+
+function animate(timestamp) {
+    if (timestamp - lastFrameTime < (1000 / targetFPS)) {
+        requestAnimationFrame(animate);
+        return;
+    }
+    lastFrameTime = timestamp;
 
     targetX += (mouseX - targetX) * 0.02;
     targetY += (mouseY - targetY) * 0.02;
@@ -2230,6 +2239,7 @@ if (circle) circle.lookAt(camera.position);
 
     composer.render();
     frame_index+=1;
+    requestAnimationFrame(animate);
 }
 
 animate();
