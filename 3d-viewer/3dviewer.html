@@ -580,7 +580,7 @@ let camera_x_offset = map(Math.random(), 0, 1, -2, 2);
 camera.position.set(camera_x_offset, 6, 22.5);
 camera.lookAt(0, 6, 0);
 camera.aspect = 1;
-const renderer = new THREE.WebGLRenderer({ antialias: true,preserveDrawingBuffer: true,  });
+const renderer = new THREE.WebGLRenderer({ precision: "mediump", antialias: true ,preserveDrawingBuffer:false});
 renderer.physicallyCorrectLights = true; 
 renderer.outputEncoding = THREE.sRGBEncoding;
 
