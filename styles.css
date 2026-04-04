@@ -6,18 +6,18 @@
 
 html {
   scroll-behavior: smooth;
+  background: #0a0a0a;
 }
 
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at 50% 20%, rgba(169, 244, 197, 0.05), transparent 35%),
-    radial-gradient(circle at 80% 30%, rgba(169, 244, 197, 0.025), transparent 25%),
-    linear-gradient(180deg, #0a0a0a 0%, #111 35%, #070707 100%);
+  background-color: #0a0a0a;
   color: var(--primary);
   font-family: 'Courier New', Courier, monospace;
   position: relative;
   overflow-x: hidden;
+  min-height: 100vh;
+  isolation: isolate;
 }
 
 body::before,
@@ -26,7 +26,7 @@ body::after {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
 }
 
 /* starfield */
