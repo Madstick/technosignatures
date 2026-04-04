@@ -352,7 +352,7 @@ main {
 }
 
 #section-pioneers {
-  background: linear-gradient(180deg, transparent 0%, rgba(26, 15, 26, 0.7) 30%, rgba(26, 15, 26, 0.7) 70%, transparent 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(39, 28, 39, 0.7) 30%, rgba(26, 15, 26, 0.7) 70%, transparent 100%);
 }
 
 #section-provenance {
@@ -420,7 +420,7 @@ main {
 .viewer-section {
   padding: 60px 0;
   text-align: center;
-  background: linear-gradient(180deg, transparent 0%, rgba(10, 26, 16, 0.7) 30%, rgba(10, 26, 16, 0.7) 70%, transparent 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(40, 70, 51, 0.7) 30%, rgba(10, 26, 16, 0.7) 70%, transparent 100%);
 }
 
 .viewer-logo {
@@ -452,7 +452,7 @@ main {
 
 /* Burn Section */
 .burn-section {
-  background: linear-gradient(180deg, transparent 0%, rgba(26, 10, 10, 0.7) 30%, rgba(26, 10, 10, 0.7) 70%, transparent 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(46, 18, 18, 0.7) 30%, rgba(26, 10, 10, 0.7) 70%, transparent 100%);
 }
 
 .burn-section .story-title {
