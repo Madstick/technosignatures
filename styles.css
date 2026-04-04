@@ -347,13 +347,6 @@ main {
   background: linear-gradient(180deg, transparent 0%, rgba(10, 10, 10, 0.8) 30%, rgba(10, 10, 10, 0.8) 70%, transparent 100%);
 }
 
-.two-column-sliders {
-  padding: 40px 0;
-  margin: 0;
-  max-width: none;
-  width: 100%;
-}
-
 #section-pioneers {
   background: linear-gradient(180deg, transparent 0%, rgba(26, 15, 26, 0.7) 30%, rgba(26, 15, 26, 0.7) 70%, transparent 100%);
 }
@@ -771,7 +764,6 @@ main {
   color: var(--primary);
   font-size: 1.2em;
   margin-top: 15px;
-  animation: pulse-glow 2s infinite;
   text-align: center;
 }
 
@@ -849,6 +841,14 @@ main {
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+    body::before,
+  body::after {
+    animation: none;
+  }
+  .slider {
+  display: inline-block;
+  animation: slide 60s linear infinite;
+}
   .mint-box {
     font-size: 1.8em;
     padding: 20px 0;
