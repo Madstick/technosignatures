@@ -71,6 +71,10 @@
     <section class="logo-section">
       <img src="./src/technosignatureslogo.png" alt="Technosignatures Logo">
     </section>
+        <section class="centered-text">
+      <p id="line3" class="blink-1s">WE NEED VOLUNTEERS</p>
+      <p id="line4" class="blink-2s">CONNECT YOUR MIND</p>
+    </section>
 
     <!-- MINT BUTTON - UNDER TITLE -->
     <section class="mint-box" id="mintBox">
@@ -80,13 +84,10 @@
     </section>
 
     <!-- BLINKING TEXT -->
-    <section class="centered-text" style="padding: 20px 0;">
-      <p id="line1" class="cursor"></p>
-      <p id="line2" class="cursor"></p>
-      <p id="line3" class="blink-1s">WE NEED VOLUNTEERS</p>
-      <p id="line4" class="blink-2s">CONNECT YOUR MIND</p>
-    </section>
-
+      <section class="centered-text">
+        <p id="line1" class="cursor"></p>
+        <p id="line2" class="cursor"></p>
+      </section>
     <!-- STORY SECTION 1: THE SNAPSHOTS -->
     <section class="story-section fade-in" id="section-snapshots">
       <h2 class="story-title glitch">// CHAPTER I: THE SNAPSHOTS //</h2>
@@ -109,7 +110,7 @@
       
       <div class="video-container">
         <div class="video-wrapper" id="video1Wrapper">
-          <video id="video1" playsinline controls preload="metadata">
+          <video id="video1" playsinline controls preload="metadata" poster="./src/technosignatures-poster.jpg">
             <source src="./src/technosignatures.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
@@ -170,33 +171,13 @@
         <p class="tu blink-2s">↓ Here are the Pioneers that discovered them ↓</p>
       </div>
       
-      <!-- INSCRIPTION (inside pioneers) -->
-      <div class="inscription-section">
-      <div id="inscription-slider" style="position:relative;width:90vmin;height:90vmin;overflow:hidden;background:#000;">
-      <div id="toggleOverlay" style="position:absolute;top:2%;right:2%;font-size:6vmin;color:#a9f4c5;cursor:pointer;z-index:3;user-select:none;">&#9776;</div>
-      <iframe id="inscriptionFrame" src="https://ordinals.com/content/3d881495a0604afb3c665ccb2117b1fb28a89e18c3b255683be7efc220b7de4ci0" 
-              style="width:100%;height:100%;border:none;display:block;" title="Inscription"></iframe>
-      <div id="overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:block;z-index:2;pointer-events:none;color:#a9f4c5;font-family:sans-serif;">
-        <div id="overlayContent" style="position:relative;height:100%;">
-          <h1 id="overlayName" style="position:absolute;top:3%;left:0;right:0;text-align:center;font-size:6vmin;margin:0;"></h1>
-          <div id="overlayDiscovered" style="position:absolute;top:12%;left:0;right:0;text-align:center;">
-            <span class="small" style="font-size:2vmin;">Discovered by</span>
-            <span class="big" style="font-size:4vmin;margin-left:1vmin;"></span>
-          </div>
-          <p id="overlayDescription" style="position:absolute;bottom:5%;left:0;right:0;text-align:center;font-size:3vmin;margin:0;padding:0 2vmin;"></p>
-        </div>
-      </div>
-      <button id="ae" style="position:absolute;width:6vmin;height:6vmin;border-radius:50%;background:#a9f4c5;border:none;opacity:0;top:73.5%;left:54%;cursor:default;z-index:4;"></button>
-      <div id="navButtons" class="nav" style="position:absolute;top:50%;width:100%;transform:translateY(-50%);display:flex;justify-content:space-between;pointer-events:none;z-index:2;">
-        <button id="prev" style="pointer-events:auto;background:rgba(0,0,0,0.7);border:none;color:#a9f4c5;font-size:4vmin;padding:1vmin 2vmin;cursor:pointer;">&#10094;</button>
-        <button id="next" style="pointer-events:auto;background:rgba(0,0,0,0.7);border:none;color:#a9f4c5;font-size:4vmin;padding:1vmin 2vmin;cursor:pointer;">&#10095;</button>
-      </div>
-      <div id="morsePanel" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:33%;padding:2vmin;background:rgba(0,0,0,0.8);border:0.5vmin solid #a9f4c5;color:#a9f4c5;text-align:center;display:none;z-index:5;">
-        <div id="morseOutput" style="font-size:3vmin;margin-bottom:2vmin;"></div>
-        <input id="morseInput" type="text" placeholder="Enter code" style="width:80%;padding:1vmin;font-size:3vmin;margin-bottom:2vmin;">
-        <p id="morseCode" style="font-family:monospace;font-size:2.5vmin;">.-. -. / .-.. .--- ... / .- . -.-. .--- .... ...- / .... -. --- .. .. -.-</p>
-      </div>
-    </div>
+      <!-- INSCRIPTION LINK (inside pioneers) -->
+      <div class="inscription-section">        
+        <a href="https://ordinals.com/content/3b20bd055da624fe47450b523c7cf08b10b8fa5e2a30789e569ae6162e9cc7b8i0" target="_blank" rel="noopener noreferrer" class="inscription-link">
+          <p class="inscription-cta">↓ Click to see the inscription live ↓</p>
+          <img src="./src/pioneersinscription.png" alt="Pioneers Inscription" class="inscription-image" loading="lazy">
+          <p class="inscription-cta">↑ Click to see the inscription live ↑</p>
+        </a>
       </div>
     </section>
 
@@ -204,7 +185,7 @@
     <section class="story-section viewer-section fade-in" id="section-viewer">
       <h2 class="story-title glitch">// CHAPTER III: THE 3D VIEWER //</h2>
       <a href="./3d-viewer/3dviewer.html" target="_blank" rel="noopener noreferrer">
-        <img src="./src/technoviewer.png" alt="TechnoViewer" class="viewer-logo" />
+        <img src="./src/technoviewer.png" alt="TechnoViewer" class="viewer-logo" loading="lazy" />
       </a>
       <div class="story-text">
         <p>
@@ -217,7 +198,7 @@
       
       <div class="video-container">
         <div class="video-wrapper" id="video2Wrapper">
-          <video id="video2" playsinline controls preload="metadata">
+          <video id="video2" playsinline controls preload="metadata" poster="./src/promo3dviewer-poster.jpg">
             <source src="./src/promo3dviewer.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
@@ -249,7 +230,7 @@
       
       <div class="video-container">
         <div class="video-wrapper" id="video3Wrapper">
-          <video id="video3" playsinline controls preload="metadata">
+          <video id="video3" playsinline controls preload="metadata" poster="./src/burndestruct-poster.jpg">
             <source src="./src/burndestruct.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
@@ -273,14 +254,14 @@
       <p class="bottom-text">
         Provenance matters, that's why we used Parent-child effectively while making sure to reduce gas cost. The main project is also inscribed on a Block9x450 Sat, as a way to represent the start of a journey, exploring and discovering the unknown and traveling together into Time, the Universe, and its wonders.  
       </p>
-      <img src="./src/organigramme.jpg" alt="Organigram" class="bottom-image">
+      <img src="./src/organigramme.jpg" alt="Organigram" class="bottom-image" loading="lazy">
     </section>
 
     <!-- TEAM SECTION -->
     <section class="two-column-section fade-in" id="section-team">
       <div class="column">
         <a href="https://x.com/leAkira_Ishi" class="column-link">
-          <img src="./src/disguy.jpg" alt="Akira PFP" class="column-image">
+          <img src="./src/disguy.jpg" alt="Akira PFP" class="column-image" loading="lazy">
         </a>
         <p class="column-text">
           <a href="https://x.com/leAkira_Ishi">Akira Ishi</a><br><br>
@@ -292,7 +273,7 @@
       </div>
       <div class="column">
         <a href="https://x.com/VolkerAr1" class="column-link">
-          <img src="./src/volker.jpg" alt="Volker PFP" class="column-image">
+          <img src="./src/volker.jpg" alt="Volker PFP" class="column-image" loading="lazy">
         </a>
         <p class="column-text">
           <a href="https://x.com/VolkerAr1">Völker</a><br><br>
@@ -305,9 +286,105 @@
   </main>
   <script defer src="https://cloud.umami.is/script.js" data-website-id="856ec09a-6a22-4175-bf39-14c4b509934a"></script>
   <script>
-const topGalleryData=[];for(let e=1;e<=20;e++)topGalleryData.push({src:`src/${e}.webp`});const duplicatedTopGalleryData=topGalleryData.concat(topGalleryData);function generateGalleryItems(e,t){const n=document.getElementById(e);t.forEach((e=>{const t=document.createElement("div");t.className="gallery-item";const o=document.createElement("img");o.src=e.src,o.alt=e.desc||"",t.appendChild(o),n.appendChild(t)}))}generateGalleryItems("topGallery",duplicatedTopGalleryData);const descriptionsLeft=['Subject 1: P-001 "The seeder", after his passage structures from this type of civilization appear on deserted planets. His tentacles seem to absorb light, probably as an energy source.',"Subject 2: P-212 From the data we gathered, it was hypothesized that the top tetrahedron sends electromagnetic waves into the ground by slamming itself on the one below on regular intervals, we do not yet know the purpose","Subject 3: We do not have encountered this subject yet.","Subject 4: P-5(0µ7 Seen roaming around on specific planets, after which the next subject is usually created. (method unknown).","Subject 5: P-1894 We observed this structure sending waves of energy to outer space, it was determined to be a form of communication.","Subject 6: We do not have encountered this subject yet.","Subject 7: C-4.s Much like plants, this type of formation grows over hundreds of years at which point cube shaped objects detach themselves from their root.","Subject 8: C-420 These subjects float on the planets for another centuries, slowly traveling in groups across the ground and through the air with equal ease","Subject 9: C-Siloli After eons of traveling, the cubes merge together to form a bigger almost unicellular formation.","Subject 10: C-2001ASO The bigger cube formation then ascend to Space, depending on the gravity of the planet they succeed and attach to meteorites, or don't. A smaller living subject was retrieved on Earth.","Subject 11: We do not have encountered this subject yet.","Subject 12: B-5P0 We have determined that these subjects act as spores, released onto planets that appears barren, to expand and multiply.","Subject 13: B-F0R It may not look like much, but these simple formations are the result of the spores infestation, capable of surviving extreme conditions and growing rapidly.","Subject 14: B-LEWIT These subjects act as unique organism, capable of detaching parts of itself. We have not yet discovered its function.","Subject 15: We do not have encountered this subject yet.","Subject 16: A-R.15  This subject seem to be able to contort itself to release big pulses of energy. We don't know its purpose.","Subject 17: A-40K From what we've gathered these rings formations seem to house vast amounts of data encoded as a quantum and antimatter-based storage system.","Subject 18: A-C12 We also discovered traces of antimatter around this structure, specialist are positive that this is an energy device acting like a solar pannel.","Subject 19: A-USS.E One of our engineer noticed spikes of energy, the structure emitting strong vibrations and again traces of antimatter. The emitted hypothesis is that this is a type of Space elevator/cannon system.","Subject 20: We do not have encountered this subject yet."],leftGalleryData=[];for(let e=1;e<=20;e++)leftGalleryData.push({src:`src/${e}b.webp`,desc:descriptionsLeft[e-1]});function cycleLeftGallery(e,t,n=3500){const o=document.getElementById(e);let a=0,s=null;function i(){const e=t[a],n=document.createElement("div");n.className="gallery-item fade-in";const i=document.createElement("img");i.src=e.src,i.alt=e.desc;const r=document.createElement("div");r.className="overlay-text",r.textContent=e.desc,n.appendChild(i),n.appendChild(r),o.appendChild(n),s=n,a=(a+1)%t.length}function r(){s?(s.classList.remove("fade-in"),s.classList.add("fade-out"),setTimeout((()=>{o.removeChild(s),i()}),50)):i()}i();let l=setInterval(r,n);o.addEventListener("mouseenter",(()=>{clearInterval(l)})),o.addEventListener("mouseleave",(()=>{clearInterval(l),l=setInterval(r,n)})),o.addEventListener("click",(()=>{clearInterval(l),r()}));const c=document.querySelector(".gallery-nav.left-arrow"),d=document.querySelector(".gallery-nav.right-arrow");function u(){clearInterval(l)}function h(){o.matches(":hover")||(clearInterval(l),l=setInterval(r,n))}c.addEventListener("mouseenter",u),d.addEventListener("mouseenter",u),c.addEventListener("mouseleave",h),d.addEventListener("mouseleave",h),c.addEventListener("click",(e=>{e.stopPropagation(),clearInterval(l),s?(s.classList.remove("fade-in"),s.classList.add("fade-out"),setTimeout((()=>{o.removeChild(s),a=(a-2+t.length)%t.length,i()}),50)):(a=(a-1+t.length)%t.length,i())})),d.addEventListener("click",(e=>{e.stopPropagation(),clearInterval(l),r()}))}cycleLeftGallery("leftGallery",leftGalleryData,3500);const textSets=[{line1:"I have never seen something like this",line2:"- Bill Ney, Scientist"},{line1:"A picture of Space, using your mind as a lens",line2:"- I. Asimov, Professor of Biochemistry"},{line1:"!RISE",line2:"- Monkey, OCM #8133"},{line1:"I'll be right here",line2:"- Zrek, Zrek"},{line1:"A window to other worlds",line2:"- Phil K. Deck, Analyst"},{line1:"Our data suggests intelligent design at a scale that redefines our understanding of the universe",line2:"- Doc Brown, Doc"},{line1:"Mmph hm mph. Hmm mmph MPHH!",line2:"- Kenny, Patient #0"},{line1:"There is so much we don't know yet..",line2:"- John Deep, Researcher"},{line1:"The universe truly is bigger and stranger than we ever dreamed",line2:"- Tyson Grasse de Neil, Astrophysicist"},{line1:"Simplicity is the key to brilliance",line2:"- Dr. B. Lee, Jeet Kune Do Astronomer"},{line1:"Seeing those structures with my own eyes was humbling",line2:"- Spock, Science Officer"},{line1:"The data we gathered from these formations pointed to a form of intelligence",line2:"- Shell Don Cooper, Theoretical Physicist"},{line1:"Data echoes alien whispers from deep space",line2:"- Sig. Weaver, Warrant Officer"},{line1:"It's just crazy bro!",line2:"- Brad, Patient #69"},{line1:"The procedure was painless, and a lifetime experience",line2:"- John, Patient #77"},{line1:"Integrating alien tech into our system was like unlocking a cosmic Rosetta Stone",line2:"- R. Sanchez, Lead Scientist"},{line1:"We like to sing, they like to listen",line2:"- Googly Rock"}];let currentSetIndex=Math.floor(Math.random()*textSets.length);const line1Element=document.getElementById("line1"),line2Element=document.getElementById("line2");function typeText(e,t,n,o){let a=0;e.textContent="",e.classList.add("cursor");const s=setInterval((()=>{e.textContent+=t[a],a++,a===t.length&&(clearInterval(s),e.classList.remove("cursor"),o&&o())}),n)}function clearText(e){e.textContent="",e.classList.add("cursor")}function runTypewriterCycle(){const e=textSets[currentSetIndex];typeText(line1Element,e.line1,40,(()=>{typeText(line2Element,e.line2,10,(()=>{setTimeout((()=>{clearText(line1Element),clearText(line2Element),currentSetIndex=(currentSetIndex+1)%textSets.length,runTypewriterCycle()}),2500)}))}))}runTypewriterCycle();const video=document.getElementById("video1");video.addEventListener("loadedmetadata",(()=>{video.volume=.4,video.muted=!1})),video.play().catch((e=>{console.log("Autoplay failed:",e)})),document.getElementById("buttonText").addEventListener("click",(function(){const e=document.getElementById("mintBox").getBoundingClientRect().top+window.pageYOffset-300;window.scrollTo({top:e,behavior:"smooth"})})),console.log("T e c h n o s i g n a t u r e s"),console.log("Website by Akira Ishi"),console.log("https://akiraishi.com"),console.log("01100100 01101001 01110011 01100011 01101111 01110110 01100101 01110010 01111001 ");
+const topGalleryData=[];for(let e=1;e<=20;e++)topGalleryData.push({src:`src/${e}.webp`});const duplicatedTopGalleryData=topGalleryData.concat(topGalleryData);function generateGalleryItems(e,t){const n=document.getElementById(e);t.forEach((e=>{const t=document.createElement("div");t.className="gallery-item";const o=document.createElement("img");o.src=e.src,o.alt=e.desc||"",t.appendChild(o),n.appendChild(t)}))}generateGalleryItems("topGallery",duplicatedTopGalleryData);const textSets = [
+  {line1:"I have never seen something like this",line2:"- Bill Ney, Scientist"},
+  {line1:"A picture of Space, using your mind as a lens",line2:"- I. Asimov, Professor of Biochemistry"},
+  {line1:"!RISE",line2:"- Monkey, OCM #8133"},
+  {line1:"I'll be right here",line2:"- Zrek, Zrek"},
+  {line1:"A window to other worlds",line2:"- Phil K. Deck, Analyst"},
+  {line1:"Our data suggests intelligent design at a scale that redefines our understanding of the universe",line2:"- Doc Brown, Doc"},
+  {line1:"Mmph hm mph. Hmm mmph MPHH!",line2:"- Kenny, Patient #0"},
+  {line1:"There is so much we don't know yet..",line2:"- John Deep, Researcher"},
+  {line1:"The universe truly is bigger and stranger than we ever dreamed",line2:"- Tyson Grasse de Neil, Astrophysicist"},
+  {line1:"Simplicity is the key to brilliance",line2:"- Dr. B. Lee, Jeet Kune Do Astronomer"},
+  {line1:"Seeing those structures with my own eyes was humbling",line2:"- Spock, Science Officer"},
+  {line1:"The data we gathered from these formations pointed to a form of intelligence",line2:"- Shell Don Cooper, Theoretical Physicist"},
+  {line1:"Data echoes alien whispers from deep space",line2:"- Sig. Weaver, Warrant Officer"},
+  {line1:"It's just crazy bro!",line2:"- Brad, Patient #69"},
+  {line1:"The procedure was painless, and a lifetime experience",line2:"- John, Patient #77"},
+  {line1:"Integrating alien tech into our system was like unlocking a cosmic Rosetta Stone",line2:"- R. Sanchez, Lead Scientist"},
+  {line1:"We like to sing, they like to listen",line2:"- Googly Rock"}
+];
+
+let currentSetIndex = Math.floor(Math.random() * textSets.length);
+
+const line1Element = document.getElementById("line1");
+const line2Element = document.getElementById("line2");
+
+function typeText(element, text, speed, callback) {
+  let i = 0;
+  element.textContent = "";
+  element.classList.add("cursor");
+
+  const interval = setInterval(() => {
+    if (i < text.length) {
+      element.textContent += text[i];
+      i++;
+    } else {
+      clearInterval(interval);
+      element.classList.remove("cursor");
+      if (callback) callback();
+    }
+  }, speed);
+}
+
+function clearText(element) {
+  element.textContent = "";
+  element.classList.add("cursor");
+}
+
+function runTypewriterCycle() {
+  const currentSet = textSets[currentSetIndex];
+
+  typeText(line1Element, currentSet.line1, 40, () => {
+    typeText(line2Element, currentSet.line2, 10, () => {
+      setTimeout(() => {
+        clearText(line1Element);
+        clearText(line2Element);
+        currentSetIndex = (currentSetIndex + 1) % textSets.length;
+        runTypewriterCycle();
+      }, 2500);
+    });
+  });
+}
+
+function runIntroThenQuotes() {
+  typeText(line1Element, "SCANNING DEEP SPACE...", 60, () => {
+    typeText(line2Element, "ALIEN STRUCTURES DETECTED", 40, () => {
+      setTimeout(() => {
+        clearText(line1Element);
+        clearText(line2Element);
+
+        setTimeout(() => {
+          runTypewriterCycle();
+        }, 400);
+      }, 1800);
+    });
+  });
+}
+
+runIntroThenQuotes();
+
+const video = document.getElementById("video1");
+video.addEventListener("loadedmetadata", () => {
+  video.volume = 0.4;
+  video.muted = false;
+});
+
+video.play().catch((e) => {
+  console.log("Autoplay failed:", e);
+});
+
+document.getElementById("buttonText").addEventListener("click", function () {
+  const targetTop = document.getElementById("mintBox").getBoundingClientRect().top + window.pageYOffset - 300;
+  window.scrollTo({ top: targetTop, behavior: "smooth" });
+});
+
+console.log("T e c h n o s i g n a t u r e s");
+console.log("Website by Akira Ishi");
+console.log("https://akiraishi.com");
+console.log("01100100 01101001 01110011 01100011 01101111 01110110 01100101 01110010 01111001 ");
 </script>
-  <script>const inscriptions=["https://ordinals.com/content/3d881495a0604afb3c665ccb2117b1fb28a89e18c3b255683be7efc220b7de4ci0","https://ordinals.com/content/28bc1d44fa554eb37041d0c1f8a3070b4ca7eadb02a047a2d914c4a6a72d766fi0","https://ordinals.com/content/5490268c80ad83a3b845280da0468c98302de5583b7a425a141092ed531985c1i4","https://ordinals.com/content/bb1dde67b65d2423d552f77ca308354157cabf30eace6b8e122f666adea0bee7i2","https://ordinals.com/content/a95e0685249c54246e64c23d809e28e578761fe80b55982a1d34372af1381c91i3"],names=["P-2S","P-!R15E","A-N0","B-0BBY","C-Anon"],descriptions=["Countless transmissions have been intercepted, all originating from this structure. Our analysts suggest that it might be a command center of some sort, issuing orders to the planets on which it is implanted. Scans indicate that it is likely part of a broader network, linking this planet to other unknown locations.","After careful analysis, our military consultants are certain this structure serves as an outpost, a communication relay and as a vital link in a larger planetary network. The worm-like formation of spheres appear to be releasing nanites into the atmosphere, most certainly as a way to achieve a complete terraformation of the planet.","We believe this structure to be a complex biomechanical lifeform, capable of twisting and manipulating its shape at will. They have been observed wandering on planets as they hover above the ground (unconfirmed theories suggest that it can manipulate local magnetic fields).","Impervious to the vacuum of space, all the signs point to this colossal structure being a hive mother. The spore carriers most likely originate from this organism that grows and multiplies indefinitely, all the while consuming a tremendous amount of unknown matter."," "],discoveredBy=["StateOfSats","NorCalDugouts","Traxhausen","Sengsengseng","Ordinally"],secretInputBase64="MTkzMA==",secretOutputBase64="b3RoZXJ3b3JkbHkgc2N1bHB0dXJlcyBodW1ibHkgYXdhaXRzLCBtb25vbGl0aHMgc2hpZnRzLCBnYXRoZXJpbmcgYmV5b25k";let currentIndex=0;const iframe=document.getElementById("inscriptionFrame"),overlayName=document.getElementById("overlayName"),overlayDescription=document.getElementById("overlayDescription"),overlayDiscoveredBig=document.querySelector("#overlayDiscovered .big"),toggleOverlay=document.getElementById("toggleOverlay"),navButtons=document.getElementById("navButtons"),ae=document.getElementById("ae"),morsePanel=document.getElementById("morsePanel"),morseOutput=document.getElementById("morseOutput"),morseInput=document.getElementById("morseInput");function updateSlide(){iframe.src=inscriptions[currentIndex],overlayName.textContent=names[currentIndex],overlayDescription.textContent=descriptions[currentIndex],overlayDiscoveredBig.textContent=discoveredBy[currentIndex],"C-Anon"===names[currentIndex]?ae.style.pointerEvents="auto":(ae.style.pointerEvents="none",morsePanel.style.display="none")}document.getElementById("next").addEventListener("click",(()=>{currentIndex=(currentIndex+1)%inscriptions.length,updateSlide()})),document.getElementById("prev").addEventListener("click",(()=>{currentIndex=(currentIndex-1+inscriptions.length)%inscriptions.length,updateSlide()})),toggleOverlay.addEventListener("click",(()=>{"none"===overlay.style.display?(overlay.style.display="block",navButtons.style.display="flex"):(overlay.style.display="none",navButtons.style.display="none",morsePanel.style.display="none")})),ae.addEventListener("click",(()=>{morsePanel.style.display="block"})),morseInput.addEventListener("keyup",(()=>{morseInput.value.trim().toLowerCase()===atob("MTkzMA==")?morseOutput.textContent=atob(secretOutputBase64):morseOutput.textContent=""})),updateSlide();</script>
 <script>
 // Click-to-play video functionality
 document.querySelectorAll('.video-wrapper').forEach(wrapper => {
@@ -349,28 +426,6 @@ const fadeObserver = new IntersectionObserver((entries) => {
 
 fadeElements.forEach(el => fadeObserver.observe(el));
 
-// Typewriter effect for lines
-const lines = [
-  { id: 'line1', text: 'SCANNING DEEP SPACE...', delay: 0 },
-  { id: 'line2', text: 'ALIEN STRUCTURES DETECTED', delay: 2000 }
-];
-
-lines.forEach(({ id, text, delay }) => {
-  const el = document.getElementById(id);
-  if (el) {
-    setTimeout(() => {
-      let i = 0;
-      const typeInterval = setInterval(() => {
-        if (i < text.length) {
-          el.textContent = text.substring(0, i + 1);
-          i++;
-        } else {
-          clearInterval(typeInterval);
-        }
-      }, 80);
-    }, delay);
-  }
-});
 
 // Trait Gallery
 const traitData = [
@@ -420,23 +475,54 @@ traitNext.addEventListener('click', () => {
 // Initialize first trait
 updateTrait();
 
-// Auto-cycle every 5 seconds
-let traitInterval = setInterval(() => {
-  traitIndex = (traitIndex + 1) % traitData.length;
-  updateTrait();
-}, 5000);
+// Auto-cycle every 5 seconds - pause when offscreen or on hover
+let traitInterval = null;
+let traitGalleryVisible = false;
+let traitGalleryHovered = false;
+const traitGalleryEl = document.getElementById('traitGallery');
 
-// Pause auto-cycle on hover
-document.getElementById('traitGallery').addEventListener('mouseenter', () => {
-  clearInterval(traitInterval);
-});
+function startTraitCycle() {
+  if (!traitInterval && traitGalleryVisible && !traitGalleryHovered) {
+    traitInterval = setInterval(() => {
+      traitIndex = (traitIndex + 1) % traitData.length;
+      updateTrait();
+    }, 5000);
+  }
+}
 
-document.getElementById('traitGallery').addEventListener('mouseleave', () => {
-  traitInterval = setInterval(() => {
-    traitIndex = (traitIndex + 1) % traitData.length;
-    updateTrait();
-  }, 5000);
-});
+function stopTraitCycle() {
+  if (traitInterval) {
+    clearInterval(traitInterval);
+    traitInterval = null;
+  }
+}
+
+// Pause auto-cycle when offscreen
+const traitObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    traitGalleryVisible = entry.isIntersecting;
+    if (entry.isIntersecting) {
+      startTraitCycle();
+    } else {
+      stopTraitCycle();
+    }
+  });
+}, { threshold: 0.1 });
+
+if (traitGalleryEl) {
+  traitObserver.observe(traitGalleryEl);
+  
+  // Pause auto-cycle on hover
+  traitGalleryEl.addEventListener('mouseenter', () => {
+    traitGalleryHovered = true;
+    stopTraitCycle();
+  });
+
+  traitGalleryEl.addEventListener('mouseleave', () => {
+    traitGalleryHovered = false;
+    startTraitCycle();
+  });
+}
 function initHeaderToggle() {
   const toggleBtn = document.getElementById('header-toggle');
   const header = document.querySelector('.fixed-nav');

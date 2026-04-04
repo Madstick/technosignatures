@@ -93,7 +93,6 @@ a {
   background: rgba(27, 27, 27, 0.95);
   border-bottom: 1px solid var(--primary);
   z-index: 1000;
-  backdrop-filter: blur(10px);
 }
 
 .fixed-nav-inner {
@@ -788,6 +787,32 @@ main {
 
 .tu {
   font-size: 18px;
+}
+
+.inscription-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.inscription-link:hover {
+  transform: scale(1.02);
+}
+
+.inscription-image {
+  max-width: 90vmin;
+  max-height: 90vmin;
+  border: 2px solid var(--primary);
+}
+
+.inscription-cta {
+  color: var(--primary);
+  font-size: 1.2em;
+  margin-top: 15px;
+  animation: pulse-glow 2s infinite;
+  text-align: center;
 }
 
 /* Bottom Section */
